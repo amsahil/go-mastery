@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTTP & Web Dev — GoGuide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--go-cyan:#00ADD8;--go-dark:#0a0e1a;--go-darker:#060810;--go-card:#0d1425;--go-border:rgba(0,173,216,0.15);--go-border-strong:rgba(0,173,216,0.4);--go-muted:#4a5568;--go-text:#e2e8f0;--go-subtle:#8892a4;--go-green:#00e599;--go-orange:#ff6b35;--go-pink:#f72585;--sidebar-w:260px}
+  *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+  body{background:var(--go-dark);color:var(--go-text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;display:flex;min-height:100vh}
+  /* --- SIDEBAR --- */
+  .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--go-darker);border-right:1px solid var(--go-border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+  .sidebar-logo{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid var(--go-border)}
+  .sidebar-logo a{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--go-cyan);text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+  .logo-glyph{width:28px;height:28px;background:var(--go-cyan);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--go-darker)}
+  .logo-badge{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-subtle);margin-top:4px;padding-left:36px}
+  .sidebar-nav{padding:1rem 0;flex:1}
+  .nav-group{margin-bottom:.25rem}
+  .nav-group-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--go-muted);padding:.75rem 1.25rem .3rem}
+  .nav-link{display:flex;align-items:center;gap:10px;padding:.45rem 1.25rem;color:var(--go-subtle);text-decoration:none;font-size:13.5px;transition:all .15s;border-left:2px solid transparent}
+  .nav-link:hover{color:var(--go-text);background:rgba(0,173,216,.05)}
+  .nav-link.active{color:var(--go-cyan);border-left-color:var(--go-cyan);background:rgba(0,173,216,.08)}
+  .nav-link .nav-icon{font-size:15px;width:18px;text-align:center}
+  .nav-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:9px;background:rgba(0,229,153,.15);color:var(--go-green);border:1px solid rgba(0,229,153,.3);padding:1px 6px;border-radius:3px}
+  .sidebar-footer{padding:1rem 1.25rem;border-top:1px solid var(--go-border);font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);line-height:1.6}
+  .sidebar-footer a{color:var(--go-cyan);text-decoration:none}
+  /* --- MAIN --- */
+  .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh}
+  .page-hero{padding:4rem 4rem 3rem;border-bottom:1px solid var(--go-border);position:relative;overflow:hidden}
+  .page-hero::before{content:'HTTP';position:absolute;right:3rem;top:50%;transform:translateY(-50%);font-family:'Syne',sans-serif;font-weight:800;font-size:9rem;color:rgba(0,173,216,.04);letter-spacing:-.05em;pointer-events:none}
+  .breadcrumb{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-muted);margin-bottom:1rem}
+  .breadcrumb a{color:var(--go-cyan);text-decoration:none}
+  .page-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.03em;color:#fff;margin-bottom:.75rem;line-height:1.1}
+  .page-hero h1 span{color:var(--go-cyan)}
+  .page-hero p{color:var(--go-subtle);max-width:540px;line-height:1.75}
+  /* --- SECTIONS --- */
+  .section{padding:3.5rem 4rem;border-bottom:1px solid var(--go-border)}
+  .section-tag{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);letter-spacing:.1em;margin-bottom:.75rem}
+  .section h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.75rem;letter-spacing:-.02em;color:#fff;margin-bottom:.5rem}
+  .section-sub{color:var(--go-subtle);max-width:600px;margin-bottom:2rem}
+  /* Code */
+  .code-block{background:var(--go-darker);border:1px solid var(--go-border);border-radius:4px;overflow:hidden;margin-bottom:1.5rem}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem;border-bottom:1px solid var(--go-border);background:rgba(0,0,0,.2)}
+  .code-filename{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-subtle)}
+  .code-lang{font-family:'Space Mono',monospace;font-size:9px;color:var(--go-muted);border:1px solid var(--go-border);padding:2px 6px;border-radius:2px}
+  .code-copy{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-cyan);background:none;border:1px solid var(--go-border-strong);padding:3px 8px;border-radius:2px;cursor:pointer;transition:all .15s}
+  .code-copy:hover{background:rgba(0,173,216,.1)}
+  pre{padding:1.25rem;overflow-x:auto;font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.75;color:#cdd6f4}
+  .kw{color:#89b4fa}.fn{color:#a6e3a1}.str{color:#f38ba8}.cmt{color:#585b70;font-style:italic}.num{color:#fab387}.ty{color:#cba6f7}
+  /* Two col */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+  @media(max-width:780px){.two-col{grid-template-columns:1fr}}
+  /* Callout */
+  .callout{border:1px solid;border-radius:4px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;gap:12px;align-items:flex-start}
+  .callout-icon{font-size:16px;margin-top:2px;flex-shrink:0}
+  .callout-body{font-size:13.5px;line-height:1.65}
+  .callout-body strong{display:block;margin-bottom:4px;font-weight:500}
+  .callout.tip{border-color:rgba(0,229,153,.25);background:rgba(0,229,153,.05)}
+  .callout.tip .callout-icon{color:var(--go-green)}.callout.tip .callout-body strong{color:var(--go-green)}.callout.tip .callout-body{color:var(--go-subtle)}
+  .callout.warn{border-color:rgba(255,107,53,.25);background:rgba(255,107,53,.05)}
+  .callout.warn .callout-icon{color:var(--go-orange)}.callout.warn .callout-body strong{color:var(--go-orange)}.callout.warn .callout-body{color:var(--go-subtle)}
+  /* HTTP Method badges */
+  .method-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--go-border);border:1px solid var(--go-border);border-radius:4px;overflow:hidden;margin-bottom:2rem}
+  .method-cell{background:var(--go-card);padding:1rem 1.25rem}
+  .method-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 10px;border-radius:2px;margin-bottom:.5rem}
+  .m-get{background:rgba(0,229,153,.15);color:var(--go-green);border:1px solid rgba(0,229,153,.3)}
+  .m-post{background:rgba(0,173,216,.15);color:var(--go-cyan);border:1px solid rgba(0,173,216,.3)}
+  .m-put{background:rgba(255,107,53,.15);color:var(--go-orange);border:1px solid rgba(255,107,53,.3)}
+  .m-patch{background:rgba(247,37,133,.15);color:var(--go-pink);border:1px solid rgba(247,37,133,.3)}
+  .m-delete{background:rgba(255,60,60,.15);color:#ff6060;border:1px solid rgba(255,60,60,.3)}
+  .method-cell h4{font-family:'Syne',sans-serif;font-weight:700;color:#fff;font-size:.9rem;margin-bottom:.3rem}
+  .method-cell p{font-size:12px;color:var(--go-subtle);line-height:1.5}
+  /* Middleware chain diagram */
+  .mw-chain{display:flex;flex-direction:column;gap:0;border:1px solid var(--go-border);border-radius:4px;overflow:hidden;margin-bottom:2rem}
+  .mw-step{display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;background:var(--go-card);border-bottom:1px solid var(--go-border);position:relative}
+  .mw-step:last-child{border-bottom:none}
+  .mw-step::before{content:'';position:absolute;left:2.35rem;bottom:-1px;width:2px;height:1px;background:var(--go-cyan)}
+  .mw-arrow{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-cyan);margin:0 .5rem}
+  .mw-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-cyan);background:rgba(0,173,216,.1);border:1px solid var(--go-border-strong);padding:3px 10px;border-radius:2px;min-width:130px;text-align:center}
+  .mw-desc{font-size:13px;color:var(--go-subtle)}
+  .mw-icon{font-size:18px;width:24px;flex-shrink:0}
+  /* Status code table */
+  .table-wrap{overflow-x:auto;border:1px solid var(--go-border);border-radius:4px;margin-bottom:2rem}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  thead th{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--go-muted);background:var(--go-darker);padding:.75rem 1rem;text-align:left;border-bottom:1px solid var(--go-border)}
+  tbody tr{border-bottom:1px solid var(--go-border);transition:background .1s}
+  tbody tr:last-child{border-bottom:none}
+  tbody tr:hover{background:rgba(0,173,216,.03)}
+  tbody td{padding:.65rem 1rem;color:var(--go-subtle)}
+  tbody td:first-child{font-family:'Space Mono',monospace;font-size:12px;font-weight:700}
+  .s2{color:var(--go-green)}.s3{color:var(--go-cyan)}.s4{color:var(--go-orange)}.s5{color:#ff6060}
+  /* Footer */
+  .footer{padding:2rem 4rem;background:var(--go-darker);border-top:1px solid var(--go-border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+  .footer-links{display:flex;gap:1.5rem}
+  .footer-links a{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-muted);text-decoration:none;transition:color .15s}
+  .footer-links a:hover{color:var(--go-cyan)}
+  .footer-copy{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted)}
+  @media(max-width:900px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.page-hero,.section{padding:2.5rem 1.5rem}.footer{padding:1.5rem}}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html"><div class="logo-glyph">Go</div>GoGuide v1.0</a>
+    <div class="logo-badge">// Developer Learning Portal</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Getting Started</div>
+      <a href="index.html" class="nav-link"><span class="nav-icon">⌂</span> Home</a>
+      <a href="roadmap.html" class="nav-link"><span class="nav-icon">⟶</span> Learning Roadmap</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Core Knowledge</div>
+      <a href="basics.html" class="nav-link"><span class="nav-icon">◈</span> Go Basics & Syntax</a>
+      <a href="concurrency.html" class="nav-link"><span class="nav-icon">⌬</span> Concurrency & Goroutines</a>
+      <a href="http.html" class="nav-link active"><span class="nav-icon">⬡</span> HTTP & Web Dev</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Applied Go</div>
+      <a href="cli.html" class="nav-link"><span class="nav-icon">$</span> CLI Tools & Tooling</a>
+      <a href="performance.html" class="nav-link"><span class="nav-icon">◎</span> Systems & Performance<span class="nav-badge">NEW</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Reference</div>
+      <a href="cheatsheet.html" class="nav-link"><span class="nav-icon">≡</span> Cheatsheet</a>
+      <a href="interview.html" class="nav-link"><span class="nav-icon">?</span> Interview Prep<span class="nav-badge">NEW</span></a>
+    </div>
+  </div>
+  <div class="sidebar-footer">Go 1.22 &nbsp;·&nbsp; <a href="https://pkg.go.dev/net/http" target="_blank">net/http Docs ↗</a><br>Open Source Learning Project.</div>
+</nav>
+
+<main class="main">
+  <div class="page-hero">
+    <div class="breadcrumb"><a href="index.html">GoGuide</a> / http</div>
+    <h1>HTTP &<br><span>Web Dev</span></h1>
+    <p>Go's standard library ships a production-grade HTTP server out of the box. No framework required. Build REST APIs, middleware chains, JSON services, and websockets — all with <code style="font-family:Space Mono,monospace;font-size:13px;color:var(--go-cyan)">net/http</code>.</p>
+  </div>
+
+  <!-- HTTP METHODS -->
+  <section class="section">
+    <div class="section-tag">// HTTP VERBS</div>
+    <h2>REST Methods at a Glance</h2>
+    <p class="section-sub">Each HTTP method has a specific semantic contract. Violating these leads to broken caches, bad clients, and confused consumers.</p>
+    <div class="method-grid">
+      <div class="method-cell"><span class="method-badge m-get">GET</span><h4>Read resource</h4><p>Safe & idempotent. Never mutates state. Can be cached freely.</p></div>
+      <div class="method-cell"><span class="method-badge m-post">POST</span><h4>Create resource</h4><p>Not idempotent. Creates a new entity. Returns 201 Created + Location header.</p></div>
+      <div class="method-cell"><span class="method-badge m-put">PUT</span><h4>Replace resource</h4><p>Idempotent full replacement. Send entire resource body. Returns 200 or 204.</p></div>
+      <div class="method-cell"><span class="method-badge m-patch">PATCH</span><h4>Partial update</h4><p>Send only fields to change. Not guaranteed idempotent. Returns 200 or 204.</p></div>
+      <div class="method-cell"><span class="method-badge m-delete">DELETE</span><h4>Remove resource</h4><p>Idempotent. Deleting something twice should not error. Returns 204 No Content.</p></div>
+    </div>
+  </section>
+
+  <!-- BASIC SERVER -->
+  <section class="section">
+    <div class="section-tag">// FOUNDATIONS</div>
+    <h2>Building Your First HTTP Server</h2>
+    <p class="section-sub">Go 1.22 upgraded <code style="font-family:Space Mono,monospace;color:var(--go-cyan);font-size:12px">net/http</code> with method-based and wildcard routing built in — no third-party router needed for most use cases.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">server.go — method routing (Go 1.22+)</span><span class="code-lang">GO</span></div>
+      <pre><span class="kw">package</span> main
+
+<span class="kw">import</span> (
+    <span class="str">"encoding/json"</span>
+    <span class="str">"log/slog"</span>
+    <span class="str">"net/http"</span>
+)
+
+<span class="kw">type</span> <span class="ty">User</span> <span class="kw">struct</span> {
+    ID   <span class="ty">int</span>    <span class="str">`json:"id"`</span>
+    Name <span class="ty">string</span> <span class="str">`json:"name"`</span>
+}
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    mux := <span class="ty">http</span>.<span class="fn">NewServeMux</span>()
+
+    <span class="cmt">// Method + path pattern (Go 1.22)</span>
+    mux.<span class="fn">HandleFunc</span>(<span class="str">"GET /users"</span>, <span class="fn">listUsers</span>)
+    mux.<span class="fn">HandleFunc</span>(<span class="str">"POST /users"</span>, <span class="fn">createUser</span>)
+    mux.<span class="fn">HandleFunc</span>(<span class="str">"GET /users/{id}"</span>, <span class="fn">getUser</span>)
+    mux.<span class="fn">HandleFunc</span>(<span class="str">"DELETE /users/{id}"</span>, <span class="fn">deleteUser</span>)
+
+    slog.<span class="fn">Info</span>(<span class="str">"server started"</span>, <span class="str">"addr"</span>, <span class="str">":8080"</span>)
+    <span class="ty">http</span>.<span class="fn">ListenAndServe</span>(<span class="str">":8080"</span>, mux)
+}
+
+<span class="kw">func</span> <span class="fn">getUser</span>(w <span class="ty">http.ResponseWriter</span>, r *<span class="ty">http.Request</span>) {
+    id := r.<span class="fn">PathValue</span>(<span class="str">"id"</span>) <span class="cmt">// extract {id} from path</span>
+    user := <span class="ty">User</span>{ID: <span class="num">1</span>, Name: <span class="str">"Alice"</span>}
+    w.<span class="fn">Header</span>().<span class="fn">Set</span>(<span class="str">"Content-Type"</span>, <span class="str">"application/json"</span>)
+    <span class="fn">json.NewEncoder</span>(w).<span class="fn">Encode</span>(user)
+    _ = id
+}</pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body">
+        <strong>Go 1.22 routing is genuinely good</strong>
+        The new <code style="font-family:Space Mono,monospace;font-size:11px">ServeMux</code> supports method routing, path wildcards, and precedence rules. For most CRUD APIs you no longer need Gorilla Mux, Chi, or Gin just for routing.
+      </div>
+    </div>
+  </section>
+
+  <!-- JSON -->
+  <section class="section">
+    <div class="section-tag">// JSON</div>
+    <h2>JSON Encoding & Decoding</h2>
+    <p class="section-sub">Go's <code style="font-family:Space Mono,monospace;color:var(--go-cyan);font-size:12px">encoding/json</code> package handles serialization with struct tags. Clean, explicit, and zero-dependency.</p>
+
+    <div class="two-col">
+      <div class="code-block" style="margin-bottom:0">
+        <div class="code-header"><span class="code-filename">decode request body</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+        <pre><span class="kw">func</span> <span class="fn">createUser</span>(
+    w <span class="ty">http.ResponseWriter</span>,
+    r *<span class="ty">http.Request</span>,
+) {
+    <span class="kw">var</span> input <span class="kw">struct</span> {
+        Name  <span class="ty">string</span> <span class="str">`json:"name"`</span>
+        Email <span class="ty">string</span> <span class="str">`json:"email"`</span>
+    }
+
+    dec := <span class="fn">json.NewDecoder</span>(r.Body)
+    dec.DisallowUnknownFields()
+    <span class="kw">if</span> err := dec.<span class="fn">Decode</span>(&input); err != <span class="kw">nil</span> {
+        <span class="fn">http.Error</span>(w, err.<span class="fn">Error</span>(), <span class="num">400</span>)
+        <span class="kw">return</span>
+    }
+
+    <span class="cmt">// input.Name and input.Email are safe</span>
+    w.<span class="fn">WriteHeader</span>(<span class="ty">http</span>.StatusCreated)
+}</pre>
+      </div>
+      <div class="code-block" style="margin-bottom:0">
+        <div class="code-header"><span class="code-filename">struct tags reference</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+        <pre><span class="kw">type</span> <span class="ty">Product</span> <span class="kw">struct</span> {
+    <span class="cmt">// Field → JSON key mapping</span>
+    ID    <span class="ty">int</span>    <span class="str">`json:"id"`</span>
+    Name  <span class="ty">string</span> <span class="str">`json:"name"`</span>
+
+    <span class="cmt">// Omit if empty</span>
+    Desc  <span class="ty">string</span> <span class="str">`json:"desc,omitempty"`</span>
+
+    <span class="cmt">// Never include in JSON</span>
+    Secret <span class="ty">string</span> <span class="str">`json:"-"`</span>
+
+    <span class="cmt">// Pointer: null-able in JSON</span>
+    Price *<span class="ty">float64</span> <span class="str">`json:"price"`</span>
+
+    <span class="cmt">// Nested struct</span>
+    Meta <span class="ty">Metadata</span> <span class="str">`json:"meta"`</span>
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- MIDDLEWARE -->
+  <section class="section">
+    <div class="section-tag">// MIDDLEWARE</div>
+    <h2>Middleware Chains</h2>
+    <p class="section-sub">Go middleware is just a function that wraps an <code style="font-family:Space Mono,monospace;color:var(--go-cyan);font-size:12px">http.Handler</code>. Chain them together to build request pipelines.</p>
+
+    <div class="mw-chain">
+      <div class="mw-step">
+        <span class="mw-icon">→</span>
+        <span class="mw-label">Request In</span>
+        <span class="mw-arrow">→</span>
+        <span class="mw-desc">Incoming HTTP request arrives at server</span>
+      </div>
+      <div class="mw-step">
+        <span class="mw-icon"> </span>
+        <span class="mw-label">Logger</span>
+        <span class="mw-arrow">→</span>
+        <span class="mw-desc">Log method, path, duration, status code</span>
+      </div>
+      <div class="mw-step">
+        <span class="mw-icon"> </span>
+        <span class="mw-label">Auth</span>
+        <span class="mw-arrow">→</span>
+        <span class="mw-desc">Validate JWT / API key — return 401 if invalid</span>
+      </div>
+      <div class="mw-step">
+        <span class="mw-icon"> </span>
+        <span class="mw-label">Rate Limiter</span>
+        <span class="mw-arrow">→</span>
+        <span class="mw-desc">Throttle per-IP requests — return 429 if exceeded</span>
+      </div>
+      <div class="mw-step">
+        <span class="mw-icon"> </span>
+        <span class="mw-label">Handler</span>
+        <span class="mw-arrow">→</span>
+        <span class="mw-desc">Your actual business logic executes here</span>
+      </div>
+      <div class="mw-step">
+        <span class="mw-icon">←</span>
+        <span class="mw-label">Response Out</span>
+        <span class="mw-arrow"> </span>
+        <span class="mw-desc">Middleware can also post-process the response</span>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">middleware.go — logger + auth pattern</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="cmt">// Middleware signature: wrap an http.Handler, return http.Handler</span>
+<span class="kw">func</span> <span class="fn">Logger</span>(next <span class="ty">http.Handler</span>) <span class="ty">http.Handler</span> {
+    <span class="kw">return</span> <span class="ty">http</span>.<span class="fn">HandlerFunc</span>(<span class="kw">func</span>(w <span class="ty">http.ResponseWriter</span>, r *<span class="ty">http.Request</span>) {
+        start := <span class="ty">time</span>.<span class="fn">Now</span>()
+        next.<span class="fn">ServeHTTP</span>(w, r)
+        slog.<span class="fn">Info</span>(<span class="str">"request"</span>,
+            <span class="str">"method"</span>, r.Method,
+            <span class="str">"path"</span>,   r.URL.Path,
+            <span class="str">"dur"</span>,    <span class="ty">time</span>.<span class="fn">Since</span>(start),
+        )
+    })
+}
+
+<span class="kw">func</span> <span class="fn">RequireAuth</span>(next <span class="ty">http.Handler</span>) <span class="ty">http.Handler</span> {
+    <span class="kw">return</span> <span class="ty">http</span>.<span class="fn">HandlerFunc</span>(<span class="kw">func</span>(w <span class="ty">http.ResponseWriter</span>, r *<span class="ty">http.Request</span>) {
+        token := r.<span class="fn">Header</span>().<span class="fn">Get</span>(<span class="str">"Authorization"</span>)
+        <span class="kw">if</span> !<span class="fn">isValidToken</span>(token) {
+            <span class="fn">http.Error</span>(w, <span class="str">"unauthorized"</span>, <span class="ty">http</span>.StatusUnauthorized)
+            <span class="kw">return</span>
+        }
+        next.<span class="fn">ServeHTTP</span>(w, r)
+    })
+}
+
+<span class="cmt">// Stack middleware: outermost runs first</span>
+handler := <span class="fn">Logger</span>(<span class="fn">RequireAuth</span>(mux))</pre>
+    </div>
+  </section>
+
+  <!-- HTTP CLIENT -->
+  <section class="section">
+    <div class="section-tag">// HTTP CLIENT</div>
+    <h2>Making HTTP Requests</h2>
+    <p class="section-sub">Go's <code style="font-family:Space Mono,monospace;color:var(--go-cyan);font-size:12px">http.Client</code> is powerful and production-ready — always configure timeouts, always close response bodies.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">client.go — production HTTP client</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="cmt">// Configure a reusable client with timeout</span>
+<span class="kw">var</span> client = &<span class="ty">http.Client</span>{
+    Timeout: <span class="num">10</span> * <span class="ty">time</span>.Second,
+    Transport: &<span class="ty">http.Transport</span>{
+        MaxIdleConns:       <span class="num">100</span>,
+        IdleConnTimeout:    <span class="num">90</span> * <span class="ty">time</span>.Second,
+        DisableCompression: <span class="kw">false</span>,
+    },
+}
+
+<span class="kw">func</span> <span class="fn">getJSON</span>(ctx <span class="ty">context.Context</span>, url <span class="ty">string</span>, out <span class="kw">any</span>) <span class="ty">error</span> {
+    req, err := <span class="ty">http</span>.<span class="fn">NewRequestWithContext</span>(ctx, <span class="ty">http</span>.MethodGet, url, <span class="kw">nil</span>)
+    <span class="kw">if</span> err != <span class="kw">nil</span> {
+        <span class="kw">return</span> <span class="fn">fmt.Errorf</span>(<span class="str">"build request: %w"</span>, err)
+    }
+    req.<span class="fn">Header</span>.<span class="fn">Set</span>(<span class="str">"Accept"</span>, <span class="str">"application/json"</span>)
+
+    resp, err := client.<span class="fn">Do</span>(req)
+    <span class="kw">if</span> err != <span class="kw">nil</span> {
+        <span class="kw">return</span> err
+    }
+    <span class="kw">defer</span> resp.Body.<span class="fn">Close</span>() <span class="cmt">// ALWAYS close body</span>
+
+    <span class="kw">if</span> resp.StatusCode != <span class="ty">http</span>.StatusOK {
+        <span class="kw">return</span> <span class="fn">fmt.Errorf</span>(<span class="str">"unexpected status: %d"</span>, resp.StatusCode)
+    }
+
+    <span class="kw">return</span> <span class="fn">json.NewDecoder</span>(resp.Body).<span class="fn">Decode</span>(out)
+}</pre>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠</span>
+      <div class="callout-body">
+        <strong>Never use http.DefaultClient in production</strong>
+        <code style="font-family:Space Mono,monospace;font-size:11px">http.DefaultClient</code> has no timeout. A single slow server can hang your goroutine forever. Always create a custom <code style="font-family:Space Mono,monospace;font-size:11px">http.Client</code> with an explicit <code style="font-family:Space Mono,monospace;font-size:11px">Timeout</code> field.
+      </div>
+    </div>
+  </section>
+
+  <!-- STATUS CODES -->
+  <section class="section">
+    <div class="section-tag">// STATUS CODES</div>
+    <h2>HTTP Status Code Reference</h2>
+    <p class="section-sub">The right status code is part of your API's contract. Go's <code style="font-family:Space Mono,monospace;color:var(--go-cyan);font-size:12px">net/http</code> package provides constants for all of them.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Code</th><th>Constant</th><th>Meaning</th><th>When to Use</th></tr></thead>
+        <tbody>
+          <tr><td class="s2">200</td><td>StatusOK</td><td>Success</td><td>GET / PUT / PATCH succeeded with body</td></tr>
+          <tr><td class="s2">201</td><td>StatusCreated</td><td>Created</td><td>POST created a new resource</td></tr>
+          <tr><td class="s2">204</td><td>StatusNoContent</td><td>No Content</td><td>DELETE / PUT succeeded, no body needed</td></tr>
+          <tr><td class="s3">301</td><td>StatusMovedPermanently</td><td>Redirect permanent</td><td>Resource moved forever — update your bookmark</td></tr>
+          <tr><td class="s3">304</td><td>StatusNotModified</td><td>Cache hit</td><td>ETag / If-None-Match matched — use cache</td></tr>
+          <tr><td class="s4">400</td><td>StatusBadRequest</td><td>Bad input</td><td>Malformed JSON, missing field, invalid param</td></tr>
+          <tr><td class="s4">401</td><td>StatusUnauthorized</td><td>Not authenticated</td><td>Missing or invalid auth token</td></tr>
+          <tr><td class="s4">403</td><td>StatusForbidden</td><td>Not authorized</td><td>Authenticated but lacks permission</td></tr>
+          <tr><td class="s4">404</td><td>StatusNotFound</td><td>Not found</td><td>Resource doesn't exist at this ID</td></tr>
+          <tr><td class="s4">409</td><td>StatusConflict</td><td>Conflict</td><td>Duplicate create, optimistic lock failure</td></tr>
+          <tr><td class="s4">422</td><td>StatusUnprocessableEntity</td><td>Validation failed</td><td>Input is valid JSON but fails business rules</td></tr>
+          <tr><td class="s4">429</td><td>StatusTooManyRequests</td><td>Rate limited</td><td>Client exceeded rate limit</td></tr>
+          <tr><td class="s5">500</td><td>StatusInternalServerError</td><td>Server error</td><td>Unhandled panic, DB error — never expose details</td></tr>
+          <tr><td class="s5">503</td><td>StatusServiceUnavailable</td><td>Unavailable</td><td>Overloaded, shutting down, circuit open</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- GRACEFUL SHUTDOWN -->
+  <section class="section">
+    <div class="section-tag">// PRODUCTION</div>
+    <h2>Graceful Shutdown</h2>
+    <p class="section-sub">Never kill your server abruptly. Use <code style="font-family:Space Mono,monospace;color:var(--go-cyan);font-size:12px">http.Server.Shutdown</code> to drain in-flight requests before exit.</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">graceful_shutdown.go</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="kw">func</span> <span class="fn">main</span>() {
+    srv := &<span class="ty">http.Server</span>{Addr: <span class="str">":8080"</span>, Handler: mux}
+
+    <span class="cmt">// Start server in goroutine</span>
+    <span class="kw">go func</span>() {
+        <span class="kw">if</span> err := srv.<span class="fn">ListenAndServe</span>(); err != <span class="ty">http</span>.ErrServerClosed {
+            <span class="fn">log.Fatal</span>(err)
+        }
+    }()
+
+    <span class="cmt">// Wait for interrupt signal</span>
+    quit := <span class="fn">make</span>(<span class="kw">chan</span> <span class="ty">os.Signal</span>, <span class="num">1</span>)
+    <span class="ty">signal</span>.<span class="fn">Notify</span>(quit, <span class="ty">syscall</span>.SIGINT, <span class="ty">syscall</span>.SIGTERM)
+    <-quit
+
+    <span class="cmt">// Give in-flight requests 30s to finish</span>
+    ctx, cancel := <span class="ty">context</span>.<span class="fn">WithTimeout</span>(<span class="ty">context</span>.<span class="fn">Background</span>(), <span class="num">30</span>*<span class="ty">time</span>.Second)
+    <span class="kw">defer</span> <span class="fn">cancel</span>()
+
+    <span class="kw">if</span> err := srv.<span class="fn">Shutdown</span>(ctx); err != <span class="kw">nil</span> {
+        <span class="fn">log.Fatal</span>(<span class="str">"shutdown error:"</span>, err)
+    }
+    slog.<span class="fn">Info</span>(<span class="str">"server stopped cleanly"</span>)
+}</pre>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="basics.html">Basics</a>
+      <a href="concurrency.html">Concurrency</a>
+      <a href="cli.html">CLI</a>
+      <a href="cheatsheet.html">Cheatsheet</a>
+    </div>
+    <div class="footer-copy">// go-developer-guide · http module</div>
+  </footer>
+</main>
+<script>
+function copyCode(btn){const pre=btn.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{btn.textContent='COPIED!';btn.style.color='var(--go-green)';setTimeout(()=>{btn.textContent='COPY';btn.style.color=''},2000)})}
+</script>
+</body>
+</html>

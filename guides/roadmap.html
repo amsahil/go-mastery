@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Roadmap — GoGuide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--go-cyan:#00ADD8;--go-dark:#0a0e1a;--go-darker:#060810;--go-card:#0d1425;--go-border:rgba(0,173,216,0.15);--go-border-strong:rgba(0,173,216,0.4);--go-muted:#4a5568;--go-text:#e2e8f0;--go-subtle:#8892a4;--go-green:#00e599;--go-orange:#ff6b35;--sidebar-w:260px}
+  *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+  body{background:var(--go-dark);color:var(--go-text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;display:flex;min-height:100vh}
+  .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--go-darker);border-right:1px solid var(--go-border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+  .sidebar-logo{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid var(--go-border)}
+  .sidebar-logo a{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--go-cyan);text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+  .logo-glyph{width:28px;height:28px;background:var(--go-cyan);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--go-darker)}
+  .logo-badge{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-subtle);margin-top:4px;padding-left:36px}
+  .sidebar-nav{padding:1rem 0;flex:1}
+  .nav-group{margin-bottom:.25rem}
+  .nav-group-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--go-muted);padding:.75rem 1.25rem .3rem}
+  .nav-link{display:flex;align-items:center;gap:10px;padding:.45rem 1.25rem;color:var(--go-subtle);text-decoration:none;font-size:13.5px;transition:all .15s;border-left:2px solid transparent}
+  .nav-link:hover{color:var(--go-text);background:rgba(0,173,216,.05)}
+  .nav-link.active{color:var(--go-cyan);border-left-color:var(--go-cyan);background:rgba(0,173,216,.08)}
+  .nav-link .nav-icon{font-size:15px;width:18px;text-align:center}
+  .nav-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:9px;background:rgba(0,229,153,.15);color:var(--go-green);border:1px solid rgba(0,229,153,.3);padding:1px 6px;border-radius:3px}
+  .sidebar-footer{padding:1rem 1.25rem;border-top:1px solid var(--go-border);font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);line-height:1.6}
+  .sidebar-footer a{color:var(--go-cyan);text-decoration:none}
+  .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh}
+  .page-hero{padding:4rem 4rem 3rem;border-bottom:1px solid var(--go-border);position:relative;overflow:hidden}
+  .page-hero::before{content:'PATH';position:absolute;right:2rem;top:50%;transform:translateY(-50%);font-family:'Syne',sans-serif;font-weight:800;font-size:10rem;color:rgba(0,173,216,.04);letter-spacing:-.05em;pointer-events:none}
+  .breadcrumb{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-muted);margin-bottom:1rem}
+  .breadcrumb a{color:var(--go-cyan);text-decoration:none}
+  .page-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.03em;color:#fff;margin-bottom:.75rem;line-height:1.1}
+  .page-hero h1 span{color:var(--go-cyan)}
+  .page-hero p{color:var(--go-subtle);max-width:540px;line-height:1.75}
+  /* Roadmap */
+  .roadmap{padding:3.5rem 4rem}
+  .phase{margin-bottom:3.5rem;position:relative}
+  .phase-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+  .phase-num{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);background:var(--go-darker);border:1px solid var(--go-border);padding:4px 10px;border-radius:2px;flex-shrink:0}
+  .phase-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#fff;letter-spacing:-.02em}
+  .phase-time{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-cyan);margin-left:auto;border:1px solid var(--go-border-strong);padding:3px 10px;border-radius:2px;background:rgba(0,173,216,.06);flex-shrink:0}
+  .phase-desc{color:var(--go-subtle);font-size:13.5px;margin-bottom:1.25rem;max-width:600px}
+  /* Topic items */
+  .topic-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.75rem}
+  .topic-item{background:var(--go-card);border:1px solid var(--go-border);border-radius:4px;padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:.75rem;text-decoration:none;transition:border-color .15s}
+  .topic-item:hover{border-color:var(--go-border-strong)}
+  .topic-check{width:18px;height:18px;border:1px solid var(--go-border-strong);border-radius:3px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--go-green)}
+  .topic-check.done{background:rgba(0,229,153,.1);border-color:rgba(0,229,153,.4)}
+  .topic-body{}
+  .topic-name{font-size:13.5px;color:var(--go-text);font-weight:500;line-height:1.4}
+  .topic-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);margin-top:3px}
+  /* Phase connector */
+  .phase-connector{display:flex;align-items:center;gap:1rem;margin-bottom:3.5rem;padding-left:1rem}
+  .connector-line{flex:1;height:1px;background:var(--go-border)}
+  .connector-arrow{font-size:18px;color:var(--go-cyan)}
+  /* Resources */
+  .resources{padding:0 4rem 3.5rem}
+  .resources h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:#fff;margin-bottom:.5rem;letter-spacing:-.02em}
+  .resources-sub{color:var(--go-subtle);font-size:13.5px;margin-bottom:1.5rem}
+  .resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+  .resource-card{background:var(--go-card);border:1px solid var(--go-border);border-radius:4px;padding:1.25rem;text-decoration:none;transition:border-color .15s;display:block}
+  .resource-card:hover{border-color:var(--go-border-strong)}
+  .resource-type{font-family:'Space Mono',monospace;font-size:9px;color:var(--go-muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.08em}
+  .resource-name{font-family:'Syne',sans-serif;font-weight:700;color:var(--go-cyan);font-size:.95rem;margin-bottom:.4rem}
+  .resource-desc{font-size:12px;color:var(--go-subtle);line-height:1.55}
+  .footer{padding:2rem 4rem;background:var(--go-darker);border-top:1px solid var(--go-border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+  .footer-links{display:flex;gap:1.5rem}
+  .footer-links a{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-muted);text-decoration:none;transition:color .15s}
+  .footer-links a:hover{color:var(--go-cyan)}
+  .footer-copy{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted)}
+  @media(max-width:900px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.page-hero,.roadmap,.resources{padding:2.5rem 1.5rem}.footer{padding:1.5rem}}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html"><div class="logo-glyph">Go</div>GoGuide v1.0</a>
+    <div class="logo-badge">// Developer Learning Portal</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Getting Started</div>
+      <a href="index.html" class="nav-link"><span class="nav-icon">⌂</span> Home</a>
+      <a href="roadmap.html" class="nav-link active"><span class="nav-icon">⟶</span> Learning Roadmap</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Core Knowledge</div>
+      <a href="basics.html" class="nav-link"><span class="nav-icon">◈</span> Go Basics & Syntax</a>
+      <a href="concurrency.html" class="nav-link"><span class="nav-icon">⌬</span> Concurrency & Goroutines</a>
+      <a href="http.html" class="nav-link"><span class="nav-icon">⬡</span> HTTP & Web Dev</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Applied Go</div>
+      <a href="cli.html" class="nav-link"><span class="nav-icon">$</span> CLI Tools & Tooling</a>
+      <a href="performance.html" class="nav-link"><span class="nav-icon">◎</span> Systems & Performance<span class="nav-badge">NEW</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Reference</div>
+      <a href="cheatsheet.html" class="nav-link"><span class="nav-icon">≡</span> Cheatsheet</a>
+      <a href="interview.html" class="nav-link"><span class="nav-icon">?</span> Interview Prep<span class="nav-badge">NEW</span></a>
+    </div>
+  </div>
+  <div class="sidebar-footer">Go 1.22 &nbsp;·&nbsp; <a href="https://go.dev/learn/" target="_blank">go.dev/learn ↗</a><br>Open Source Learning Project.</div>
+</nav>
+
+<main class="main">
+  <div class="page-hero">
+    <div class="breadcrumb"><a href="index.html">GoGuide</a> / roadmap</div>
+    <h1>Your <span>Learning</span><br>Roadmap</h1>
+    <p>A structured, milestone-based path from absolute zero to writing production Go services. Follow the phases in order — each builds on the last.</p>
+  </div>
+
+  <div class="roadmap">
+
+    <!-- PHASE 1 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 01</span>
+        <span class="phase-title">The Language Itself</span>
+        <span class="phase-time">Week 1–2</span>
+      </div>
+      <p class="phase-desc">Get Go installed, understand the module system, and build fluency in core syntax. By the end of this phase you can write a real Go program from scratch.</p>
+      <div class="topic-list">
+        <div class="topic-item"><div class="topic-check done">✓</div><div class="topic-body"><div class="topic-name">Install Go & configure $GOPATH</div><div class="topic-sub">go.dev/doc/install</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Variables, types & zero values</div><div class="topic-sub">basics.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Functions, multiple returns & closures</div><div class="topic-sub">basics.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Structs, methods & interfaces</div><div class="topic-sub">basics.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Slices, maps, and range</div><div class="topic-sub">basics.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Error handling patterns</div><div class="topic-sub">basics.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Packages & go modules (go.mod)</div><div class="topic-sub">go mod init</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">The Go Tour — complete it</div><div class="topic-sub">go.dev/tour</div></div></div>
+      </div>
+    </div>
+
+    <div class="phase-connector"><div class="connector-line"></div><span class="connector-arrow">↓</span><div class="connector-line"></div></div>
+
+    <!-- PHASE 2 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 02</span>
+        <span class="phase-title">Concurrency</span>
+        <span class="phase-time">Week 3–4</span>
+      </div>
+      <p class="phase-desc">This is Go's killer feature. Invest serious time here — goroutines and channels underpin every real Go system you'll ever build.</p>
+      <div class="topic-list">
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Goroutines — launch & lifecycle</div><div class="topic-sub">concurrency.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Buffered & unbuffered channels</div><div class="topic-sub">concurrency.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">sync.WaitGroup & sync.Mutex</div><div class="topic-sub">concurrency.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">select statement & timeouts</div><div class="topic-sub">concurrency.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">context.Context — cancellation</div><div class="topic-sub">concurrency.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Worker pool pattern</div><div class="topic-sub">concurrency.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Detect data races: go test -race</div><div class="topic-sub">cli.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Build: concurrent file processor</div><div class="topic-sub">project milestone</div></div></div>
+      </div>
+    </div>
+
+    <div class="phase-connector"><div class="connector-line"></div><span class="connector-arrow">↓</span><div class="connector-line"></div></div>
+
+    <!-- PHASE 3 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 03</span>
+        <span class="phase-title">HTTP & Web Dev</span>
+        <span class="phase-time">Week 5–6</span>
+      </div>
+      <p class="phase-desc">Build real REST APIs using Go's powerful standard library. Add a database, middleware, and graceful shutdown.</p>
+      <div class="topic-list">
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">net/http server & ServeMux (1.22+)</div><div class="topic-sub">http.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">JSON encoding & struct tags</div><div class="topic-sub">http.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Middleware chains (Logger, Auth)</div><div class="topic-sub">http.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">HTTP client with timeout</div><div class="topic-sub">http.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Graceful shutdown with signals</div><div class="topic-sub">http.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">database/sql or sqlx with Postgres</div><div class="topic-sub">pkg.go.dev</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Build: full CRUD REST API</div><div class="topic-sub">project milestone</div></div></div>
+      </div>
+    </div>
+
+    <div class="phase-connector"><div class="connector-line"></div><span class="connector-arrow">↓</span><div class="connector-line"></div></div>
+
+    <!-- PHASE 4 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 04</span>
+        <span class="phase-title">CLI Tools & Testing</span>
+        <span class="phase-time">Week 7</span>
+      </div>
+      <p class="phase-desc">Ship real tools. Build a CLI with subcommands, write proper tests, and understand Go's toolchain deeply.</p>
+      <div class="topic-list">
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">flag package — parse CLI args</div><div class="topic-sub">cli.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Cobra — subcommand CLIs</div><div class="topic-sub">cli.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Table-driven tests with testing.T</div><div class="topic-sub">cli.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Benchmarks with testing.B</div><div class="topic-sub">performance.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">go build, go vet, gofmt, staticcheck</div><div class="topic-sub">cli.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Cross-compilation (GOOS/GOARCH)</div><div class="topic-sub">cli.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Build: a CLI tool you use daily</div><div class="topic-sub">project milestone</div></div></div>
+      </div>
+    </div>
+
+    <div class="phase-connector"><div class="connector-line"></div><span class="connector-arrow">↓</span><div class="connector-line"></div></div>
+
+    <!-- PHASE 5 -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 05</span>
+        <span class="phase-title">Performance & Production</span>
+        <span class="phase-time">Week 8–9</span>
+      </div>
+      <p class="phase-desc">This is where you go from writing Go to writing <em>fast</em> Go. Profiling, GC tuning, escape analysis, and deployment.</p>
+      <div class="topic-list">
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">pprof — CPU and heap profiling</div><div class="topic-sub">performance.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Escape analysis (go build -gcflags='-m')</div><div class="topic-sub">performance.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">sync.Pool for buffer reuse</div><div class="topic-sub">performance.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">GOMAXPROCS & scheduler tuning</div><div class="topic-sub">performance.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Docker: multi-stage Go build</div><div class="topic-sub">deploy</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Structured logging with slog</div><div class="topic-sub">Go 1.21+</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Interview Prep — read all Q&As</div><div class="topic-sub">interview.html</div></div></div>
+        <div class="topic-item"><div class="topic-check"></div><div class="topic-body"><div class="topic-name">Build: deploy a service to production</div><div class="topic-sub">capstone project</div></div></div>
+      </div>
+    </div>
+
+  </div><!-- end roadmap -->
+
+  <!-- RESOURCES -->
+  <div class="resources">
+    <h2>Essential Resources</h2>
+    <p class="resources-sub">Hand-picked — not exhaustive. These are the ones that actually move the needle.</p>
+    <div class="resource-grid">
+      <a class="resource-card" href="https://go.dev/tour/" target="_blank">
+        <div class="resource-type">Interactive</div>
+        <div class="resource-name">A Tour of Go</div>
+        <div class="resource-desc">The official interactive intro. Complete this first, before anything else.</div>
+      </a>
+      <a class="resource-card" href="https://go.dev/doc/effective_go" target="_blank">
+        <div class="resource-type">Official Guide</div>
+        <div class="resource-name">Effective Go</div>
+        <div class="resource-desc">The canonical guide to writing idiomatic Go. Written by the language authors.</div>
+      </a>
+      <a class="resource-card" href="https://gobyexample.com/" target="_blank">
+        <div class="resource-type">Examples</div>
+        <div class="resource-name">Go by Example</div>
+        <div class="resource-desc">Short, runnable code examples for every major Go concept. Bookmarkable reference.</div>
+      </a>
+      <a class="resource-card" href="https://100go.co/" target="_blank">
+        <div class="resource-type">Book</div>
+        <div class="resource-name">100 Go Mistakes</div>
+        <div class="resource-desc">The best intermediate Go book. Covers real pitfalls from production codebases.</div>
+      </a>
+      <a class="resource-card" href="https://pkg.go.dev/" target="_blank">
+        <div class="resource-type">Reference</div>
+        <div class="resource-name">pkg.go.dev</div>
+        <div class="resource-desc">The official package documentation for the standard library and all public Go modules.</div>
+      </a>
+      <a class="resource-card" href="https://github.com/golang/go/wiki/CodeReviewComments" target="_blank">
+        <div class="resource-type">Style Guide</div>
+        <div class="resource-name">Go Code Review Comments</div>
+        <div class="resource-desc">The unofficial style guide used by the Go team. Read this before submitting your first PR.</div>
+      </a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="basics.html">Basics</a>
+      <a href="concurrency.html">Concurrency</a>
+      <a href="cheatsheet.html">Cheatsheet</a>
+      <a href="interview.html">Interview Prep</a>
+    </div>
+    <div class="footer-copy">// go-developer-guide · roadmap</div>
+  </footer>
+</main>
+</body>
+</html>

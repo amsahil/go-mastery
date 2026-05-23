@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go Cheatsheet — GoGuide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--go-cyan:#00ADD8;--go-dark:#0a0e1a;--go-darker:#060810;--go-card:#0d1425;--go-border:rgba(0,173,216,0.15);--go-border-strong:rgba(0,173,216,0.4);--go-muted:#4a5568;--go-text:#e2e8f0;--go-subtle:#8892a4;--go-green:#00e599;--go-orange:#ff6b35;--sidebar-w:260px}
+  *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+  body{background:var(--go-dark);color:var(--go-text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;display:flex;min-height:100vh}
+  .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--go-darker);border-right:1px solid var(--go-border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+  .sidebar-logo{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid var(--go-border)}
+  .sidebar-logo a{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--go-cyan);text-decoration:none;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px}
+  .logo-glyph{width:28px;height:28px;background:var(--go-cyan);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--go-darker)}
+  .logo-badge{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-subtle);margin-top:4px;padding-left:36px}
+  .sidebar-nav{padding:1rem 0;flex:1}
+  .nav-group{margin-bottom:.25rem}
+  .nav-group-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--go-muted);padding:.75rem 1.25rem .3rem}
+  .nav-link{display:flex;align-items:center;gap:10px;padding:.45rem 1.25rem;color:var(--go-subtle);text-decoration:none;font-size:13.5px;transition:all .15s;border-left:2px solid transparent}
+  .nav-link:hover{color:var(--go-text);background:rgba(0,173,216,.05)}
+  .nav-link.active{color:var(--go-cyan);border-left-color:var(--go-cyan);background:rgba(0,173,216,.08)}
+  .nav-link .nav-icon{font-size:15px;width:18px;text-align:center}
+  .nav-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:9px;background:rgba(0,229,153,.15);color:var(--go-green);border:1px solid rgba(0,229,153,.3);padding:1px 6px;border-radius:3px}
+  .sidebar-footer{padding:1rem 1.25rem;border-top:1px solid var(--go-border);font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);line-height:1.6}
+  .sidebar-footer a{color:var(--go-cyan);text-decoration:none}
+  .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh}
+  .page-hero{padding:4rem 4rem 3rem;border-bottom:1px solid var(--go-border);position:relative;overflow:hidden}
+  .page-hero::before{content:'CHEATSHEET';position:absolute;right:2rem;top:50%;transform:translateY(-50%);font-family:'Syne',sans-serif;font-weight:800;font-size:5.5rem;color:rgba(0,173,216,.04);letter-spacing:-.05em;pointer-events:none;white-space:nowrap}
+  .breadcrumb{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-muted);margin-bottom:1rem}
+  .breadcrumb a{color:var(--go-cyan);text-decoration:none}
+  .page-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.03em;color:#fff;margin-bottom:.75rem;line-height:1.1}
+  .page-hero h1 span{color:var(--go-cyan)}
+  .page-hero p{color:var(--go-subtle);max-width:540px;line-height:1.75}
+  .cheat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1.5rem;padding:3rem 4rem}
+  .cheat-card{background:var(--go-card);border:1px solid var(--go-border);border-radius:4px;overflow:hidden}
+  .cheat-card-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid var(--go-border);background:rgba(0,0,0,.2)}
+  .cheat-card-title{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-cyan);letter-spacing:.05em}
+  .code-copy{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-cyan);background:none;border:1px solid var(--go-border-strong);padding:3px 8px;border-radius:2px;cursor:pointer;transition:all .15s}
+  .code-copy:hover{background:rgba(0,173,216,.1)}
+  pre{padding:1rem;overflow-x:auto;font-family:'Space Mono',monospace;font-size:12px;line-height:1.75;color:#cdd6f4}
+  .kw{color:#89b4fa}.fn{color:#a6e3a1}.str{color:#f38ba8}.cmt{color:#585b70;font-style:italic}.num{color:#fab387}.ty{color:#cba6f7}
+  .footer{padding:2rem 4rem;background:var(--go-darker);border-top:1px solid var(--go-border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+  .footer-links{display:flex;gap:1.5rem}
+  .footer-links a{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-muted);text-decoration:none;transition:color .15s}
+  .footer-links a:hover{color:var(--go-cyan)}
+  .footer-copy{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted)}
+  @media(max-width:900px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.page-hero{padding:2.5rem 1.5rem}.cheat-grid{padding:1.5rem;grid-template-columns:1fr}.footer{padding:1.5rem}}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html"><div class="logo-glyph">Go</div>GoGuide v1.0</a>
+    <div class="logo-badge">// Developer Learning Portal</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Getting Started</div>
+      <a href="index.html" class="nav-link"><span class="nav-icon">⌂</span> Home</a>
+      <a href="roadmap.html" class="nav-link"><span class="nav-icon">⟶</span> Learning Roadmap</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Core Knowledge</div>
+      <a href="basics.html" class="nav-link"><span class="nav-icon">◈</span> Go Basics & Syntax</a>
+      <a href="concurrency.html" class="nav-link"><span class="nav-icon">⌬</span> Concurrency & Goroutines</a>
+      <a href="http.html" class="nav-link"><span class="nav-icon">⬡</span> HTTP & Web Dev</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Applied Go</div>
+      <a href="cli.html" class="nav-link"><span class="nav-icon">$</span> CLI Tools & Tooling</a>
+      <a href="performance.html" class="nav-link"><span class="nav-icon">◎</span> Systems & Performance<span class="nav-badge">NEW</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Reference</div>
+      <a href="cheatsheet.html" class="nav-link active"><span class="nav-icon">≡</span> Cheatsheet</a>
+      <a href="interview.html" class="nav-link"><span class="nav-icon">?</span> Interview Prep<span class="nav-badge">NEW</span></a>
+    </div>
+  </div>
+  <div class="sidebar-footer">Go 1.22 &nbsp;·&nbsp; <a href="https://go.dev/ref/spec" target="_blank">Language Spec ↗</a><br>Open Source Learning Project.</div>
+</nav>
+
+<main class="main">
+  <div class="page-hero">
+    <div class="breadcrumb"><a href="index.html">GoGuide</a> / cheatsheet</div>
+    <h1>Go <span>Cheatsheet</span></h1>
+    <p>Every essential Go pattern in one dense reference. Copy, paste, ship.</p>
+  </div>
+
+  <div class="cheat-grid">
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">VARIABLES & TYPES</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="kw">var</span> x <span class="ty">int</span> = <span class="num">10</span>
+y := <span class="num">20</span>                   <span class="cmt">// short decl</span>
+<span class="kw">const</span> Pi = <span class="num">3.14</span>
+<span class="kw">var</span> s <span class="ty">string</span>              <span class="cmt">// zero value: ""</span>
+<span class="kw">var</span> p *<span class="ty">int</span>               <span class="cmt">// nil pointer</span>
+a, b := <span class="num">1</span>, <span class="num">2</span>            <span class="cmt">// multi-assign</span>
+_, err := <span class="fn">doThing</span>()     <span class="cmt">// blank identifier</span></pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">CONTROL FLOW</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="cmt">// if with init statement</span>
+<span class="kw">if</span> v, err := <span class="fn">parse</span>(s); err != <span class="kw">nil</span> {
+    <span class="fn">log.Fatal</span>(err)
+}
+
+<span class="cmt">// switch (no fallthrough by default)</span>
+<span class="kw">switch</span> x {
+<span class="kw">case</span> <span class="num">1</span>:  <span class="fn">fmt.Println</span>(<span class="str">"one"</span>)
+<span class="kw">default</span>: <span class="fn">fmt.Println</span>(<span class="str">"other"</span>)
+}
+
+<span class="cmt">// for is the only loop</span>
+<span class="kw">for</span> i := <span class="num">0</span>; i < <span class="num">10</span>; i++ { }
+<span class="kw">for</span> i, v := <span class="kw">range</span> slice { }
+<span class="kw">for</span> k, v := <span class="kw">range</span> myMap { }</pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">SLICES</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre>s := []<span class="ty">int</span>{<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s = <span class="fn">append</span>(s, <span class="num">4</span>, <span class="num">5</span>)
+s2 := <span class="fn">make</span>([]<span class="ty">int</span>, <span class="num">0</span>, <span class="num">10</span>)  <span class="cmt">// len=0, cap=10</span>
+sub := s[<span class="num">1</span>:<span class="num">3</span>]               <span class="cmt">// [2, 3]</span>
+<span class="fn">copy</span>(dst, src)
+<span class="fn">len</span>(s), <span class="fn">cap</span>(s)
+
+<span class="cmt">// 2D slice</span>
+grid := <span class="fn">make</span>([][]<span class="ty">int</span>, rows)
+<span class="kw">for</span> i := <span class="kw">range</span> grid {
+    grid[i] = <span class="fn">make</span>([]<span class="ty">int</span>, cols)
+}</pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">MAPS</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre>m := <span class="fn">make</span>(<span class="kw">map</span>[<span class="ty">string</span>]<span class="ty">int</span>)
+m[<span class="str">"key"</span>] = <span class="num">42</span>
+<span class="kw">delete</span>(m, <span class="str">"key"</span>)
+
+<span class="cmt">// Check existence</span>
+v, ok := m[<span class="str">"key"</span>]
+<span class="kw">if</span> !ok { <span class="cmt">/* key missing */</span> }
+
+<span class="cmt">// Map literal</span>
+counts := <span class="kw">map</span>[<span class="ty">string</span>]<span class="ty">int</span>{
+    <span class="str">"go"</span>:     <span class="num">1</span>,
+    <span class="str">"python"</span>: <span class="num">2</span>,
+}
+
+<span class="cmt">// Iterate</span>
+<span class="kw">for</span> k, v := <span class="kw">range</span> m { }</pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">STRUCTS & METHODS</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="kw">type</span> <span class="ty">User</span> <span class="kw">struct</span> {
+    Name string
+    Age  int
+}
+
+<span class="cmt">// Value receiver (no mutation)</span>
+<span class="kw">func</span> (u <span class="ty">User</span>) <span class="fn">String</span>() <span class="ty">string</span> {
+    <span class="kw">return</span> u.Name
+}
+
+<span class="cmt">// Pointer receiver (can mutate)</span>
+<span class="kw">func</span> (u *<span class="ty">User</span>) <span class="fn">Birthday</span>() {
+    u.Age++
+}
+
+u := <span class="ty">User</span>{Name: <span class="str">"Alice"</span>, Age: <span class="num">30</span>}
+u.<span class="fn">Birthday</span>()
+<span class="fn">fmt.Println</span>(u.<span class="fn">String</span>())</pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">INTERFACES</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="kw">type</span> <span class="ty">Writer</span> <span class="kw">interface</span> {
+    <span class="fn">Write</span>([]<span class="ty">byte</span>) (<span class="ty">int</span>, <span class="ty">error</span>)
+}
+
+<span class="cmt">// Type assertion</span>
+<span class="kw">var</span> i <span class="ty">interface</span>{} = <span class="str">"hello"</span>
+s, ok := i.(<span class="ty">string</span>)  <span class="cmt">// safe</span>
+
+<span class="cmt">// Type switch</span>
+<span class="kw">switch</span> v := i.(<span class="kw">type</span>) {
+<span class="kw">case</span> <span class="ty">string</span>:  <span class="fn">fmt.Println</span>(<span class="str">"str"</span>, v)
+<span class="kw">case</span> <span class="ty">int</span>:     <span class="fn">fmt.Println</span>(<span class="str">"int"</span>, v)
+<span class="kw">default</span>:      <span class="fn">fmt.Println</span>(<span class="str">"other"</span>)
+}</pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">GOROUTINES & CHANNELS</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="kw">go</span> <span class="fn">doWork</span>()              <span class="cmt">// launch goroutine</span>
+
+ch := <span class="fn">make</span>(<span class="kw">chan</span> <span class="ty">int</span>)       <span class="cmt">// unbuffered</span>
+ch := <span class="fn">make</span>(<span class="kw">chan</span> <span class="ty">int</span>, <span class="num">5</span>)    <span class="cmt">// buffered</span>
+ch <- <span class="num">42</span>                  <span class="cmt">// send</span>
+v := <-ch                  <span class="cmt">// receive</span>
+<span class="kw">close</span>(ch)                  <span class="cmt">// close</span>
+
+<span class="kw">var</span> wg <span class="ty">sync.WaitGroup</span>
+wg.<span class="fn">Add</span>(<span class="num">1</span>)
+<span class="kw">go func</span>() {
+    <span class="kw">defer</span> wg.<span class="fn">Done</span>()
+    <span class="fn">doWork</span>()
+}()
+wg.<span class="fn">Wait</span>()</pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">ERROR HANDLING</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre>result, err := <span class="fn">doThing</span>()
+<span class="kw">if</span> err != <span class="kw">nil</span> {
+    <span class="kw">return</span> <span class="fn">fmt.Errorf</span>(<span class="str">"context: %w"</span>, err)
+}
+
+<span class="cmt">// Sentinel error</span>
+<span class="kw">var</span> ErrNotFound = <span class="ty">errors</span>.<span class="fn">New</span>(<span class="str">"not found"</span>)
+
+<span class="cmt">// Check error type</span>
+<span class="ty">errors</span>.<span class="fn">Is</span>(err, ErrNotFound)
+
+<span class="cmt">// Extract error value</span>
+<span class="kw">var</span> e *<span class="ty">MyError</span>
+<span class="ty">errors</span>.<span class="fn">As</span>(err, &e)
+
+<span class="cmt">// Panic recovery</span>
+<span class="kw">defer func</span>() {
+    <span class="kw">if</span> r := <span class="fn">recover</span>(); r != <span class="kw">nil</span> { }
+}()</pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">NET/HTTP SERVER</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="fn">http.HandleFunc</span>(<span class="str">"/"</span>, <span class="kw">func</span>(
+    w <span class="ty">http.ResponseWriter</span>,
+    r *<span class="ty">http.Request</span>,
+) {
+    <span class="fn">json.NewEncoder</span>(w).<span class="fn">Encode</span>(data)
+})
+
+<span class="fn">http.ListenAndServe</span>(<span class="str">":8080"</span>, <span class="kw">nil</span>)
+
+<span class="cmt">// Custom mux</span>
+mux := <span class="ty">http</span>.<span class="fn">NewServeMux</span>()
+mux.<span class="fn">HandleFunc</span>(<span class="str">"GET /users/{id}"</span>, handler)
+<span class="ty">http</span>.<span class="fn">ListenAndServe</span>(<span class="str">":8080"</span>, mux)</pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">FILE I/O</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="cmt">// Read entire file</span>
+data, err := <span class="ty">os</span>.<span class="fn">ReadFile</span>(<span class="str">"file.txt"</span>)
+
+<span class="cmt">// Write file</span>
+<span class="ty">os</span>.<span class="fn">WriteFile</span>(<span class="str">"out.txt"</span>, data, <span class="num">0644</span>)
+
+<span class="cmt">// Open with defer close</span>
+f, err := <span class="ty">os</span>.<span class="fn">Open</span>(<span class="str">"file.txt"</span>)
+<span class="kw">if</span> err != <span class="kw">nil</span> { <span class="fn">log.Fatal</span>(err) }
+<span class="kw">defer</span> f.<span class="fn">Close</span>()
+
+scanner := <span class="ty">bufio</span>.<span class="fn">NewScanner</span>(f)
+<span class="kw">for</span> scanner.<span class="fn">Scan</span>() {
+    <span class="fn">fmt.Println</span>(scanner.<span class="fn">Text</span>())
+}</pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">TESTING</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="cmt">// file: math_test.go</span>
+<span class="kw">func</span> <span class="fn">TestAdd</span>(t *<span class="ty">testing.T</span>) {
+    got := <span class="fn">Add</span>(<span class="num">2</span>, <span class="num">3</span>)
+    <span class="kw">if</span> got != <span class="num">5</span> {
+        t.<span class="fn">Errorf</span>(<span class="str">"got %d, want 5"</span>, got)
+    }
+}
+
+<span class="cmt">// Table-driven tests</span>
+tests := []<span class="kw">struct</span>{ a, b, want <span class="ty">int</span> }{
+    {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}, {<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>},
+}
+<span class="cmt">// go test ./...</span>
+<span class="cmt">// go test -race ./...</span>
+<span class="cmt">// go test -bench=.</span></pre>
+    </div>
+
+    <div class="cheat-card">
+      <div class="cheat-card-header"><span class="cheat-card-title">GO TOOLS</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="cmt"># Format code</span>
+gofmt -w .
+goimports -w .
+
+<span class="cmt"># Lint</span>
+go vet ./...
+staticcheck ./...
+
+<span class="cmt"># Dependencies</span>
+go mod init github.com/user/pkg
+go mod tidy
+go get github.com/pkg/errors@v1.2.0
+
+<span class="cmt"># Build & run</span>
+go build -o bin/app .
+go run main.go
+
+<span class="cmt"># Cross compile</span>
+GOOS=linux GOARCH=amd64 go build .</pre>
+    </div>
+
+  </div><!-- end cheat-grid -->
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="basics.html">Basics</a>
+      <a href="concurrency.html">Concurrency</a>
+      <a href="http.html">HTTP</a>
+      <a href="interview.html">Interview Prep</a>
+    </div>
+    <div class="footer-copy">// go-developer-guide · cheatsheet</div>
+  </footer>
+</main>
+
+<script>
+function copyCode(btn) {
+  const pre = btn.closest('.cheat-card').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'COPIED!';
+    btn.style.color = 'var(--go-green)';
+    setTimeout(() => { btn.textContent = 'COPY'; btn.style.color = ''; }, 2000);
+  });
+}
+</script>
+</body>
+</html>

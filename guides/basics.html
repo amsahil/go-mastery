@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go Basics & Syntax — GoGuide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --go-cyan:#00ADD8;--go-dark:#0a0e1a;--go-darker:#060810;--go-card:#0d1425;
+    --go-border:rgba(0,173,216,0.15);--go-border-strong:rgba(0,173,216,0.4);
+    --go-muted:#4a5568;--go-text:#e2e8f0;--go-subtle:#8892a4;
+    --go-green:#00e599;--go-orange:#ff6b35;--sidebar-w:260px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+  body{background:var(--go-dark);color:var(--go-text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;display:flex;min-height:100vh}
+  .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--go-darker);border-right:1px solid var(--go-border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+  .sidebar-logo{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid var(--go-border)}
+  .sidebar-logo a{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--go-cyan);text-decoration:none;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px}
+  .logo-glyph{width:28px;height:28px;background:var(--go-cyan);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--go-darker)}
+  .logo-badge{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-subtle);margin-top:4px;padding-left:36px}
+  .sidebar-nav{padding:1rem 0;flex:1}
+  .nav-group{margin-bottom:0.25rem}
+  .nav-group-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--go-muted);padding:0.75rem 1.25rem 0.3rem}
+  .nav-link{display:flex;align-items:center;gap:10px;padding:0.45rem 1.25rem;color:var(--go-subtle);text-decoration:none;font-size:13.5px;transition:all 0.15s;border-left:2px solid transparent}
+  .nav-link:hover{color:var(--go-text);background:rgba(0,173,216,0.05)}
+  .nav-link.active{color:var(--go-cyan);border-left-color:var(--go-cyan);background:rgba(0,173,216,0.08)}
+  .nav-link .nav-icon{font-size:15px;width:18px;text-align:center}
+  .nav-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:9px;background:rgba(0,229,153,0.15);color:var(--go-green);border:1px solid rgba(0,229,153,0.3);padding:1px 6px;border-radius:3px}
+  .sidebar-footer{padding:1rem 1.25rem;border-top:1px solid var(--go-border);font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);line-height:1.6}
+  .sidebar-footer a{color:var(--go-cyan);text-decoration:none}
+  .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh}
+  .page-hero{padding:4rem 4rem 3rem;border-bottom:1px solid var(--go-border);position:relative;overflow:hidden}
+  .page-hero::before{content:'SYNTAX';position:absolute;right:3rem;top:50%;transform:translateY(-50%);font-family:'Syne',sans-serif;font-weight:800;font-size:7rem;color:rgba(0,173,216,0.04);letter-spacing:-0.05em;pointer-events:none;white-space:nowrap}
+  .breadcrumb{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-muted);margin-bottom:1rem}
+  .breadcrumb a{color:var(--go-cyan);text-decoration:none}
+  .page-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,4vw,3rem);letter-spacing:-0.03em;color:#fff;margin-bottom:0.75rem;line-height:1.1}
+  .page-hero h1 span{color:var(--go-cyan)}
+  .page-hero p{color:var(--go-subtle);max-width:540px;line-height:1.75}
+  .section{padding:3.5rem 4rem;border-bottom:1px solid var(--go-border)}
+  .section-tag{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);letter-spacing:0.1em;margin-bottom:0.75rem}
+  .section h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.75rem;letter-spacing:-0.02em;color:#fff;margin-bottom:0.5rem}
+  .section-sub{color:var(--go-subtle);max-width:540px;margin-bottom:2rem}
+  .code-block{background:var(--go-darker);border:1px solid var(--go-border);border-radius:4px;overflow:hidden;margin-bottom:1.5rem}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;border-bottom:1px solid var(--go-border);background:rgba(0,0,0,0.2)}
+  .code-filename{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-subtle)}
+  .code-copy{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-cyan);background:none;border:1px solid var(--go-border-strong);padding:3px 8px;border-radius:2px;cursor:pointer;transition:all 0.15s}
+  .code-copy:hover{background:rgba(0,173,216,0.1)}
+  pre{padding:1.25rem;overflow-x:auto;font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.75;color:#cdd6f4}
+  .kw{color:#89b4fa}.fn{color:#a6e3a1}.str{color:#f38ba8}.cmt{color:#585b70;font-style:italic}.num{color:#fab387}.ty{color:#cba6f7}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+  @media(max-width:760px){.two-col{grid-template-columns:1fr}}
+  .callout{border:1px solid;border-radius:4px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;gap:12px;align-items:flex-start}
+  .callout-icon{font-size:16px;margin-top:2px;flex-shrink:0}
+  .callout-body{font-size:13.5px;line-height:1.65}
+  .callout-body strong{display:block;margin-bottom:4px;font-weight:500}
+  .callout.tip{border-color:rgba(0,229,153,0.25);background:rgba(0,229,153,0.05)}
+  .callout.tip .callout-icon{color:var(--go-green)}.callout.tip .callout-body strong{color:var(--go-green)}.callout.tip .callout-body{color:var(--go-subtle)}
+  .callout.info{border-color:rgba(0,173,216,0.25);background:rgba(0,173,216,0.05)}
+  .callout.info .callout-icon{color:var(--go-cyan)}.callout.info .callout-body strong{color:var(--go-cyan)}.callout.info .callout-body{color:var(--go-subtle)}
+  /* Type table */
+  .type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--go-border);border:1px solid var(--go-border);border-radius:4px;overflow:hidden;margin-bottom:2rem}
+  .type-cell{background:var(--go-card);padding:1rem 1.25rem}
+  .type-name{font-family:'Space Mono',monospace;font-size:12px;color:var(--go-cyan);margin-bottom:4px}
+  .type-desc{font-size:12px;color:var(--go-subtle);line-height:1.5}
+  .type-example{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-orange);margin-top:6px}
+  .footer{padding:2rem 4rem;background:var(--go-darker);border-top:1px solid var(--go-border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+  .footer-links{display:flex;gap:1.5rem}
+  .footer-links a{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-muted);text-decoration:none;transition:color 0.15s}
+  .footer-links a:hover{color:var(--go-cyan)}
+  .footer-copy{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted)}
+  @media(max-width:900px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.page-hero,.section{padding:2.5rem 1.5rem}.footer{padding:1.5rem}}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html"><div class="logo-glyph">Go</div>GoGuide v1.0</a>
+    <div class="logo-badge">// Developer Learning Portal</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Getting Started</div>
+      <a href="index.html" class="nav-link"><span class="nav-icon">⌂</span> Home</a>
+      <a href="roadmap.html" class="nav-link"><span class="nav-icon">⟶</span> Learning Roadmap</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Core Knowledge</div>
+      <a href="basics.html" class="nav-link active"><span class="nav-icon">◈</span> Go Basics & Syntax</a>
+      <a href="concurrency.html" class="nav-link"><span class="nav-icon">⌬</span> Concurrency & Goroutines</a>
+      <a href="http.html" class="nav-link"><span class="nav-icon">⬡</span> HTTP & Web Dev</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Applied Go</div>
+      <a href="cli.html" class="nav-link"><span class="nav-icon">$</span> CLI Tools & Tooling</a>
+      <a href="performance.html" class="nav-link"><span class="nav-icon">◎</span> Systems & Performance<span class="nav-badge">NEW</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Reference</div>
+      <a href="cheatsheet.html" class="nav-link"><span class="nav-icon">≡</span> Cheatsheet</a>
+      <a href="interview.html" class="nav-link"><span class="nav-icon">?</span> Interview Prep<span class="nav-badge">NEW</span></a>
+    </div>
+  </div>
+  <div class="sidebar-footer">Go 1.22 &nbsp;·&nbsp; <a href="https://go.dev/tour/" target="_blank">Go Tour ↗</a><br>Open Source Learning Project.</div>
+</nav>
+
+<main class="main">
+  <div class="page-hero">
+    <div class="breadcrumb"><a href="index.html">GoGuide</a> / basics</div>
+    <h1>Go Basics &<br><span>Syntax</span></h1>
+    <p>Everything you need to write your first real Go program. Types, functions, structs, interfaces, and the error handling philosophy that makes Go unique.</p>
+  </div>
+
+  <!-- VARIABLES -->
+  <section class="section">
+    <div class="section-tag">// VARIABLES & TYPES</div>
+    <h2>Variables & Type System</h2>
+    <p class="section-sub">Go is statically typed. Every variable has a type known at compile time. Go infers types when possible — keeping code concise without sacrificing safety.</p>
+
+    <div class="two-col">
+      <div class="code-block" style="margin-bottom:0">
+        <div class="code-header"><span class="code-filename">declaration styles</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+        <pre><span class="cmt">// Explicit type</span>
+<span class="kw">var</span> name <span class="ty">string</span> = <span class="str">"Gopher"</span>
+<span class="kw">var</span> age  <span class="ty">int</span>    = <span class="num">10</span>
+
+<span class="cmt">// Type inferred</span>
+<span class="kw">var</span> lang = <span class="str">"Go"</span>
+
+<span class="cmt">// Short declaration (inside func only)</span>
+city := <span class="str">"Chennai"</span>
+count := <span class="num">42</span>
+
+<span class="cmt">// Multiple vars</span>
+x, y := <span class="num">10</span>, <span class="num">20</span>
+
+<span class="cmt">// Zero values — no undefined!</span>
+<span class="kw">var</span> n   <span class="ty">int</span>     <span class="cmt">// 0</span>
+<span class="kw">var</span> s   <span class="ty">string</span>  <span class="cmt">// ""</span>
+<span class="kw">var</span> ok  <span class="ty">bool</span>    <span class="cmt">// false</span></pre>
+      </div>
+      <div class="code-block" style="margin-bottom:0">
+        <div class="code-header"><span class="code-filename">constants & iota</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+        <pre><span class="kw">const</span> Pi = <span class="num">3.14159</span>
+<span class="kw">const</span> MaxRetries = <span class="num">3</span>
+
+<span class="cmt">// iota — auto-incrementing constants</span>
+<span class="kw">type</span> <span class="ty">Direction</span> <span class="ty">int</span>
+
+<span class="kw">const</span> (
+    North <span class="ty">Direction</span> = <span class="kw">iota</span> <span class="cmt">// 0</span>
+    South                   <span class="cmt">// 1</span>
+    East                    <span class="cmt">// 2</span>
+    West                    <span class="cmt">// 3</span>
+)
+
+<span class="cmt">// Bit flags with iota</span>
+<span class="kw">const</span> (
+    Read  = <span class="num">1</span> << <span class="kw">iota</span> <span class="cmt">// 1</span>
+    Write               <span class="cmt">// 2</span>
+    Exec                <span class="cmt">// 4</span>
+)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUILT-IN TYPES -->
+  <section class="section">
+    <div class="section-tag">// BUILT-IN TYPES</div>
+    <h2>Go's Type Palette</h2>
+    <p class="section-sub">Go's built-in types are simple, predictable, and explicit about size.</p>
+    <div class="type-grid">
+      <div class="type-cell"><div class="type-name">bool</div><div class="type-desc">True or false. Zero value: false.</div><div class="type-example">true, false</div></div>
+      <div class="type-cell"><div class="type-name">int / int64</div><div class="type-desc">Platform-size or explicit 64-bit integer.</div><div class="type-example">42, -7, 0</div></div>
+      <div class="type-cell"><div class="type-name">float64</div><div class="type-desc">IEEE 754 double-precision float.</div><div class="type-example">3.14, -0.5</div></div>
+      <div class="type-cell"><div class="type-name">string</div><div class="type-desc">Immutable UTF-8 byte sequence.</div><div class="type-example">"hello", \`raw\`</div></div>
+      <div class="type-cell"><div class="type-name">[]T — slice</div><div class="type-desc">Dynamic array. The workhorse of Go collections.</div><div class="type-example">[]int{1, 2, 3}</div></div>
+      <div class="type-cell"><div class="type-name">map[K]V</div><div class="type-desc">Hash map. Keys must be comparable types.</div><div class="type-example">map[string]int{}</div></div>
+      <div class="type-cell"><div class="type-name">struct</div><div class="type-desc">Composite type — fields with names and types.</div><div class="type-example">type Point struct{}</div></div>
+      <div class="type-cell"><div class="type-name">error</div><div class="type-desc">Built-in interface. nil means no error.</div><div class="type-example">errors.New("msg")</div></div>
+    </div>
+  </section>
+
+  <!-- FUNCTIONS -->
+  <section class="section">
+    <div class="section-tag">// FUNCTIONS</div>
+    <h2>Functions — First Class Citizens</h2>
+    <p class="section-sub">Go functions are clean, explicit, and support multiple return values — which is how idiomatic Go handles errors.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">functions.go</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="cmt">// Basic function</span>
+<span class="kw">func</span> <span class="fn">add</span>(a, b <span class="ty">int</span>) <span class="ty">int</span> {
+    <span class="kw">return</span> a + b
+}
+
+<span class="cmt">// Multiple return values — idiomatic Go</span>
+<span class="kw">func</span> <span class="fn">divide</span>(a, b <span class="ty">float64</span>) (<span class="ty">float64</span>, <span class="ty">error</span>) {
+    <span class="kw">if</span> b == <span class="num">0</span> {
+        <span class="kw">return</span> <span class="num">0</span>, <span class="fn">fmt.Errorf</span>(<span class="str">"division by zero"</span>)
+    }
+    <span class="kw">return</span> a / b, <span class="kw">nil</span>
+}
+
+<span class="cmt">// Variadic function</span>
+<span class="kw">func</span> <span class="fn">sum</span>(nums ...<span class="ty">int</span>) <span class="ty">int</span> {
+    total := <span class="num">0</span>
+    <span class="kw">for</span> _, n := <span class="kw">range</span> nums {
+        total += n
+    }
+    <span class="kw">return</span> total
+}
+
+<span class="cmt">// First-class: functions as values</span>
+<span class="kw">func</span> <span class="fn">apply</span>(f <span class="kw">func</span>(<span class="ty">int</span>) <span class="ty">int</span>, v <span class="ty">int</span>) <span class="ty">int</span> {
+    <span class="kw">return</span> <span class="fn">f</span>(v)
+}
+
+<span class="cmt">// Closure</span>
+<span class="kw">func</span> <span class="fn">counter</span>() <span class="kw">func</span>() <span class="ty">int</span> {
+    n := <span class="num">0</span>
+    <span class="kw">return func</span>() <span class="ty">int</span> {
+        n++
+        <span class="kw">return</span> n
+    }
+}</pre>
+    </div>
+  </section>
+
+  <!-- STRUCTS & INTERFACES -->
+  <section class="section">
+    <div class="section-tag">// STRUCTS & INTERFACES</div>
+    <h2>Structs, Methods & Interfaces</h2>
+    <p class="section-sub">Go has no classes. Instead: structs with methods, and interfaces satisfied implicitly — one of Go's most elegant design choices.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">structs_interfaces.go</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="cmt">// Define a struct</span>
+<span class="kw">type</span> <span class="ty">Animal</span> <span class="kw">struct</span> {
+    Name  <span class="ty">string</span>
+    Sound <span class="ty">string</span>
+    Legs  <span class="ty">int</span>
+}
+
+<span class="cmt">// Method on a struct (pointer receiver — can mutate)</span>
+<span class="kw">func</span> (a *<span class="ty">Animal</span>) <span class="fn">Speak</span>() <span class="ty">string</span> {
+    <span class="kw">return</span> <span class="fn">fmt.Sprintf</span>(<span class="str">"%s says %s"</span>, a.Name, a.Sound)
+}
+
+<span class="cmt">// Interface — implicit satisfaction</span>
+<span class="kw">type</span> <span class="ty">Speaker</span> <span class="kw">interface</span> {
+    <span class="fn">Speak</span>() <span class="ty">string</span>
+}
+
+<span class="cmt">// Animal implements Speaker automatically — no 'implements' keyword</span>
+<span class="kw">func</span> <span class="fn">makeNoise</span>(s <span class="ty">Speaker</span>) {
+    <span class="fn">fmt.Println</span>(s.<span class="fn">Speak</span>())
+}
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    dog := &<span class="ty">Animal</span>{Name: <span class="str">"Dog"</span>, Sound: <span class="str">"Woof"</span>, Legs: <span class="num">4</span>}
+    <span class="fn">makeNoise</span>(dog) <span class="cmt">// "Dog says Woof"</span>
+}</pre>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">◈</span>
+      <div class="callout-body">
+        <strong>Interface Satisfaction is Implicit</strong>
+        In Go, a type satisfies an interface simply by implementing its methods. No explicit declaration like <code style="font-family:Space Mono,monospace;font-size:11px">implements Speaker</code> is needed. This is called structural typing and is one of Go's most powerful features — it decouples your code naturally.
+      </div>
+    </div>
+  </section>
+
+  <!-- ERROR HANDLING -->
+  <section class="section">
+    <div class="section-tag">// ERROR HANDLING</div>
+    <h2>Errors as Values</h2>
+    <p class="section-sub">Go has no exceptions. Errors are plain values returned from functions. This forces you to handle them explicitly — which leads to more reliable, predictable code.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">errors.go — idiomatic patterns</span><button class="code-copy" onclick="copyCode(this)">COPY</button></div>
+      <pre><span class="cmt">// Sentinel errors — compare with ==</span>
+<span class="kw">var</span> ErrNotFound = <span class="ty">errors</span>.<span class="fn">New</span>(<span class="str">"not found"</span>)
+
+<span class="cmt">// Custom error type with context</span>
+<span class="kw">type</span> <span class="ty">ValidationError</span> <span class="kw">struct</span> {
+    Field   <span class="ty">string</span>
+    Message <span class="ty">string</span>
+}
+
+<span class="kw">func</span> (e *<span class="ty">ValidationError</span>) <span class="fn">Error</span>() <span class="ty">string</span> {
+    <span class="kw">return</span> <span class="fn">fmt.Sprintf</span>(<span class="str">"validation error on %s: %s"</span>, e.Field, e.Message)
+}
+
+<span class="cmt">// Wrapping errors (Go 1.13+)</span>
+<span class="kw">func</span> <span class="fn">loadUser</span>(id <span class="ty">int</span>) (*<span class="ty">User</span>, <span class="ty">error</span>) {
+    u, err := <span class="fn">db.FindUser</span>(id)
+    <span class="kw">if</span> err != <span class="kw">nil</span> {
+        <span class="kw">return</span> <span class="kw">nil</span>, <span class="fn">fmt.Errorf</span>(<span class="str">"loadUser %d: %w"</span>, id, err)
+    }
+    <span class="kw">return</span> u, <span class="kw">nil</span>
+}
+
+<span class="cmt">// Unwrapping to check type</span>
+<span class="kw">if</span> <span class="ty">errors</span>.<span class="fn">Is</span>(err, ErrNotFound) { ... }
+<span class="kw">var</span> valErr *<span class="ty">ValidationError</span>
+<span class="kw">if</span> <span class="ty">errors</span>.<span class="fn">As</span>(err, &valErr) { ... }</pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body">
+        <strong>Always wrap errors with context</strong>
+        Use <code style="font-family:Space Mono,monospace;font-size:11px">fmt.Errorf("doing X: %w", err)</code> to add context as errors bubble up. This builds a clear error chain that makes debugging production issues far easier. The <code style="font-family:Space Mono,monospace;font-size:11px">%w</code> verb preserves the original error for <code style="font-family:Space Mono,monospace;font-size:11px">errors.Is</code> and <code style="font-family:Space Mono,monospace;font-size:11px">errors.As</code>.
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="concurrency.html">Concurrency</a>
+      <a href="http.html">HTTP</a>
+      <a href="cli.html">CLI</a>
+      <a href="cheatsheet.html">Cheatsheet</a>
+    </div>
+    <div class="footer-copy">// go-developer-guide · basics module</div>
+  </footer>
+</main>
+
+<script>
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'COPIED!';
+    btn.style.color = 'var(--go-green)';
+    setTimeout(() => { btn.textContent = 'COPY'; btn.style.color = ''; }, 2000);
+  });
+}
+</script>
+</body>
+</html>

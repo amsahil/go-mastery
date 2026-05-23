@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="The complete Go developer guide — from zero to production. Learn concurrency, HTTP, CLI tools, systems programming, and more.">
+<title>GoGuide — Master Go from Zero to Production</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --go-cyan: #00ADD8;
+    --go-dark: #0a0e1a;
+    --go-darker: #060810;
+    --go-card: #0d1425;
+    --go-border: rgba(0,173,216,0.15);
+    --go-border-strong: rgba(0,173,216,0.4);
+    --go-muted: #4a5568;
+    --go-text: #e2e8f0;
+    --go-subtle: #8892a4;
+    --go-green: #00e599;
+    --go-orange: #ff6b35;
+    --go-pink: #f72585;
+    --sidebar-w: 260px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--go-dark);
+    color: var(--go-text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--go-darker);
+    border-right: 1px solid var(--go-border);
+    position: fixed;
+    top: 0; left: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 1.5rem 1.25rem 1rem;
+    border-bottom: 1px solid var(--go-border);
+  }
+  .sidebar-logo a {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--go-cyan);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-glyph {
+    width: 28px; height: 28px;
+    background: var(--go-cyan);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--go-darker);
+  }
+  .logo-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-subtle);
+    margin-top: 4px;
+    padding-left: 36px;
+  }
+
+  .sidebar-nav { padding: 1rem 0; flex: 1; }
+  .nav-group { margin-bottom: 0.25rem; }
+  .nav-group-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--go-muted);
+    padding: 0.75rem 1.25rem 0.3rem;
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.45rem 1.25rem;
+    color: var(--go-subtle);
+    text-decoration: none;
+    font-size: 13.5px;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .nav-link:hover { color: var(--go-text); background: rgba(0,173,216,0.05); }
+  .nav-link.active {
+    color: var(--go-cyan);
+    border-left-color: var(--go-cyan);
+    background: rgba(0,173,216,0.08);
+  }
+  .nav-link .nav-icon {
+    font-size: 15px;
+    width: 18px;
+    text-align: center;
+  }
+  .nav-badge {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    background: rgba(0,229,153,0.15);
+    color: var(--go-green);
+    border: 1px solid rgba(0,229,153,0.3);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+
+  .sidebar-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--go-border);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-muted);
+    line-height: 1.6;
+  }
+  .sidebar-footer a { color: var(--go-cyan); text-decoration: none; }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    padding: 6rem 4rem 5rem;
+    overflow: hidden;
+    border-bottom: 1px solid var(--go-border);
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,173,216,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,173,216,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+  .hero-glow {
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,173,216,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--go-cyan);
+    border: 1px solid var(--go-border-strong);
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    background: rgba(0,173,216,0.05);
+  }
+  .hero-tag-dot { width: 6px; height: 6px; background: var(--go-green); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.25rem;
+    color: #fff;
+  }
+  .hero h1 span { color: var(--go-cyan); }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--go-subtle);
+    max-width: 560px;
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 3rem; }
+  .btn-primary {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    background: var(--go-cyan);
+    color: var(--go-darker);
+    padding: 10px 20px;
+    border-radius: 3px;
+    text-decoration: none;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    transition: all 0.15s;
+  }
+  .btn-primary:hover { background: #00c4f5; transform: translateY(-1px); }
+  .btn-ghost {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--go-cyan);
+    border: 1px solid var(--go-border-strong);
+    padding: 10px 20px;
+    border-radius: 3px;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: all 0.15s;
+  }
+  .btn-ghost:hover { background: rgba(0,173,216,0.08); }
+
+  .hero-stats {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .stat { }
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: #fff;
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-muted);
+    margin-top: 4px;
+  }
+
+  /* ── CONTENT SECTIONS ── */
+  .section {
+    padding: 4rem;
+    border-bottom: 1px solid var(--go-border);
+  }
+  .section-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+  .section h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.9rem;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+  .section-sub {
+    color: var(--go-subtle);
+    max-width: 540px;
+    margin-bottom: 2.5rem;
+  }
+
+  /* Feature Cards */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--go-border);
+    border: 1px solid var(--go-border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .feature-card {
+    background: var(--go-card);
+    padding: 1.75rem;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .feature-card:hover { background: #111928; }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: transparent;
+    transition: background 0.15s;
+  }
+  .feature-card:hover::before { background: var(--go-cyan); }
+
+  .card-icon {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--go-cyan);
+    background: rgba(0,173,216,0.1);
+    border: 1px solid var(--go-border-strong);
+    padding: 4px 8px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+  .feature-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+  .feature-card p {
+    font-size: 13px;
+    color: var(--go-subtle);
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+  }
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+  .tag-cyan { color: var(--go-cyan); border-color: rgba(0,173,216,0.3); background: rgba(0,173,216,0.07); }
+  .tag-green { color: var(--go-green); border-color: rgba(0,229,153,0.3); background: rgba(0,229,153,0.07); }
+  .tag-orange { color: var(--go-orange); border-color: rgba(255,107,53,0.3); background: rgba(255,107,53,0.07); }
+
+  /* Before/After */
+  .ba-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  @media(max-width:700px){ .ba-grid{ grid-template-columns:1fr; } }
+  .ba-card {
+    background: var(--go-card);
+    border: 1px solid var(--go-border);
+    border-radius: 4px;
+    padding: 1.5rem;
+  }
+  .ba-card.good { border-top: 2px solid var(--go-green); }
+  .ba-card.bad { border-top: 2px solid var(--go-orange); }
+  .ba-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+  .ba-card.good .ba-label { color: var(--go-green); }
+  .ba-card.bad .ba-label { color: var(--go-orange); }
+  .ba-list { list-style: none; }
+  .ba-list li {
+    font-size: 13.5px;
+    color: var(--go-subtle);
+    padding: 5px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    border-bottom: 1px solid var(--go-border);
+  }
+  .ba-list li:last-child { border-bottom: none; }
+  .ba-list li span { margin-top: 2px; }
+
+  /* Comparison Table */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--go-border);
+    border-radius: 4px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  thead th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--go-muted);
+    background: var(--go-darker);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--go-border);
+  }
+  tbody tr { border-bottom: 1px solid var(--go-border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(0,173,216,0.03); }
+  tbody td { padding: 0.65rem 1rem; color: var(--go-subtle); }
+  tbody td:first-child { color: var(--go-text); font-weight: 500; }
+
+  /* Code block */
+  .code-block {
+    background: var(--go-darker);
+    border: 1px solid var(--go-border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--go-border);
+    background: rgba(0,0,0,0.2);
+  }
+  .code-filename {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--go-subtle);
+  }
+  .code-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-cyan);
+    background: none;
+    border: 1px solid var(--go-border-strong);
+    padding: 3px 8px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .code-copy:hover { background: rgba(0,173,216,0.1); }
+  pre {
+    padding: 1.25rem;
+    overflow-x: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: #cdd6f4;
+  }
+  .kw { color: #89b4fa; }
+  .fn { color: #a6e3a1; }
+  .str { color: #f38ba8; }
+  .cmt { color: #585b70; font-style: italic; }
+  .num { color: #fab387; }
+  .ty { color: #cba6f7; }
+
+  /* Company cards */
+  .company-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+  .company-card {
+    background: var(--go-card);
+    border: 1px solid var(--go-border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    transition: border-color 0.15s;
+  }
+  .company-card:hover { border-color: var(--go-border-strong); }
+  .company-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+  .company-desc {
+    font-size: 13px;
+    color: var(--go-subtle);
+    line-height: 1.6;
+  }
+  .company-detail {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-cyan);
+    margin-top: 0.75rem;
+  }
+
+  /* Pipeline */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0;
+    background: var(--go-border);
+    border: 1px solid var(--go-border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .pipe-step {
+    background: var(--go-card);
+    padding: 1.5rem;
+    position: relative;
+  }
+  .pipe-step:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--go-cyan);
+    font-size: 18px;
+    z-index: 1;
+    background: var(--go-card);
+    padding: 0 2px;
+  }
+  .pipe-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-muted);
+    margin-bottom: 0.5rem;
+  }
+  .pipe-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+  }
+  .pipe-desc { font-size: 12px; color: var(--go-subtle); line-height: 1.5; }
+
+  /* FOOTER */
+  .footer {
+    padding: 2rem 4rem;
+    background: var(--go-darker);
+    border-top: 1px solid var(--go-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--go-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer-links a:hover { color: var(--go-cyan); }
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-muted);
+  }
+
+  /* Responsive */
+  @media(max-width:900px){
+    .sidebar { transform: translateX(-100%); }
+    .main { margin-left: 0; }
+    .hero, .section { padding: 3rem 1.5rem; }
+    .footer { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html">
+      <div class="logo-glyph">Go</div>
+      GoGuide v1.0
+    </a>
+    <div class="logo-badge">// Developer Learning Portal</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Getting Started</div>
+      <a href="index.html" class="nav-link active">
+        <span class="nav-icon">⌂</span> Home
+      </a>
+      <a href="roadmap.html" class="nav-link">
+        <span class="nav-icon">⟶</span> Learning Roadmap
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Core Knowledge</div>
+      <a href="basics.html" class="nav-link">
+        <span class="nav-icon">◈</span> Go Basics & Syntax
+      </a>
+      <a href="concurrency.html" class="nav-link">
+        <span class="nav-icon">⌬</span> Concurrency & Goroutines
+      </a>
+      <a href="http.html" class="nav-link">
+        <span class="nav-icon">⬡</span> HTTP & Web Dev
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Applied Go</div>
+      <a href="cli.html" class="nav-link">
+        <span class="nav-icon">$</span> CLI Tools & Tooling
+      </a>
+      <a href="performance.html" class="nav-link">
+        <span class="nav-icon">◎</span> Systems & Performance
+        <span class="nav-badge">NEW</span>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Reference</div>
+      <a href="cheatsheet.html" class="nav-link">
+        <span class="nav-icon">≡</span> Cheatsheet
+      </a>
+      <a href="interview.html" class="nav-link">
+        <span class="nav-icon">?</span> Interview Prep
+        <span class="nav-badge">NEW</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    Go 1.22 &nbsp;·&nbsp; <a href="https://go.dev/doc/" target="_blank">Official Docs ↗</a><br>
+    Apache Software Foundation trademark notice.<br>
+    Open Source Learning Project.
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+
+    <div class="hero-tag">
+      <span class="hero-tag-dot"></span>
+      go-guide / home &nbsp;·&nbsp; Go 1.22
+    </div>
+
+    <h1>Master Go —<br>From <span>Zero</span> to<br>Production.</h1>
+
+    <p class="hero-sub">
+      The complete developer guide to building fast, concurrent, production-grade
+      systems with Go. Goroutines, HTTP servers, CLI tools, and more —
+      all in one place.
+    </p>
+
+    <div class="hero-btns">
+      <a href="roadmap.html" class="btn-primary">→ Start Learning Path</a>
+      <a href="basics.html" class="btn-ghost">Explore Basics</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-val">1.4M+</div>
+        <div class="stat-label">Go Developers Worldwide</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">3× faster</div>
+        <div class="stat-label">Compilation vs Java</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">8</div>
+        <div class="stat-label">Learning Modules</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">2009</div>
+        <div class="stat-label">Born at Google</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT IS GO -->
+  <section class="section">
+    <div class="section-tag">// FOUNDATION</div>
+    <h2>What is Go?</h2>
+    <p class="section-sub">
+      A statically typed, compiled language designed for simplicity, reliability,
+      and high-performance concurrency — built for the modern cloud era.
+    </p>
+
+    <div class="cards-grid">
+      <div class="feature-card">
+        <div class="card-icon">SIMPLE</div>
+        <h3>Radical Simplicity</h3>
+        <p>Go has 25 keywords. No classes, no inheritance, no operator overloading. The entire language fits in your head — and it stays there.</p>
+        <div class="card-tags">
+          <span class="tag tag-cyan">Readable</span>
+          <span class="tag tag-cyan">Minimal</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="card-icon">FAST</div>
+        <h3>Compiled Speed</h3>
+        <p>Compiles to native machine code in seconds. Garbage collected, yet fast. Binaries start in milliseconds — no JVM, no interpreter, no runtime dependency.</p>
+        <div class="card-tags">
+          <span class="tag tag-green">Native Binary</span>
+          <span class="tag tag-green">Sub-second Build</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="card-icon">GOROUTINE</div>
+        <h3>Built-in Concurrency</h3>
+        <p>Goroutines are lightweight threads managed by the Go runtime. Spawn thousands of them. Communicate via channels — not shared memory.</p>
+        <div class="card-tags">
+          <span class="tag tag-cyan">Goroutines</span>
+          <span class="tag tag-cyan">Channels</span>
+          <span class="tag tag-green">CSP Model</span>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="card-icon">STDLIB</div>
+        <h3>Batteries Included</h3>
+        <p>Go's standard library covers HTTP servers, JSON, testing, crypto, SQL, templates, and more — with zero external dependencies required.</p>
+        <div class="card-tags">
+          <span class="tag tag-orange">net/http</span>
+          <span class="tag tag-orange">encoding/json</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY GO -->
+  <section class="section">
+    <div class="section-tag">// THE PROBLEM</div>
+    <h2>Why Go Exists</h2>
+    <p class="section-sub">
+      Google engineers grew frustrated with C++, Java, and Python build times, complexity, and concurrency primitives. Go was the answer.
+    </p>
+
+    <div class="ba-grid">
+      <div class="ba-card bad">
+        <div class="ba-label">✕ WITHOUT GO</div>
+        <ul class="ba-list">
+          <li><span>⚠</span> Callback hell and complex threading models</li>
+          <li><span>⚠</span> Slow compilation with large C++ codebases</li>
+          <li><span>⚠</span> Heavyweight runtimes for simple services</li>
+          <li><span>⚠</span> Complex dependency management nightmares</li>
+          <li><span>⚠</span> Verbose boilerplate for every pattern</li>
+        </ul>
+      </div>
+      <div class="ba-card good">
+        <div class="ba-label">✓ WITH GO</div>
+        <ul class="ba-list">
+          <li><span style="color:var(--go-green)">✓</span> Goroutines and channels — simple concurrency</li>
+          <li><span style="color:var(--go-green)">✓</span> Sub-second compile times for large projects</li>
+          <li><span style="color:var(--go-green)">✓</span> Single static binary — deploy anywhere</li>
+          <li><span style="color:var(--go-green)">✓</span> Go modules — clean, reproducible deps</li>
+          <li><span style="color:var(--go-green)">✓</span> Explicit, minimal, readable by design</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- HELLO WORLD QUICK START -->
+  <section class="section">
+    <div class="section-tag">// QUICK START</div>
+    <h2>Get Running Fast</h2>
+    <p class="section-sub">From install to your first running Go program in under 5 minutes.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">main.go — Hello, Gopher</span>
+        <button class="code-copy" onclick="copyCode(this)">COPY</button>
+      </div>
+      <pre><span class="kw">package</span> main
+
+<span class="kw">import</span> (
+    <span class="str">"fmt"</span>
+    <span class="str">"net/http"</span>
+)
+
+<span class="kw">func</span> <span class="fn">handler</span>(w <span class="ty">http.ResponseWriter</span>, r *<span class="ty">http.Request</span>) {
+    <span class="fn">fmt.Fprintf</span>(w, <span class="str">"Hello, Gopher! 🐹"</span>)
+}
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    <span class="cmt">// Register route and start server</span>
+    <span class="ty">http</span>.<span class="fn">HandleFunc</span>(<span class="str">"/"</span>, handler)
+    <span class="ty">http</span>.<span class="fn">ListenAndServe</span>(<span class="str">":8080"</span>, <span class="kw">nil</span>)
+}</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">bash — Install, init, run</span>
+        <button class="code-copy" onclick="copyCode(this)">COPY</button>
+      </div>
+      <pre><span class="cmt"># Install Go (macOS)</span>
+brew install go
+
+<span class="cmt"># Create a new module</span>
+mkdir my-app && cd my-app
+go mod init github.com/you/my-app
+
+<span class="cmt"># Run directly</span>
+go run main.go
+
+<span class="cmt"># Compile to binary</span>
+go build -o my-app .
+./my-app</pre>
+    </div>
+  </section>
+
+  <!-- GO vs OTHERS -->
+  <section class="section">
+    <div class="section-tag">// KEY COMPARISON</div>
+    <h2>Go vs The Field</h2>
+    <p class="section-sub">How Go stacks up against other backend languages on the axes that matter in production.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Aspect</th>
+            <th>Go</th>
+            <th>Java</th>
+            <th>Python</th>
+            <th>Rust</th>
+            <th>Node.js</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Compilation</td>
+            <td style="color:var(--go-green)">Native binary</td>
+            <td>JVM bytecode</td>
+            <td>Interpreted</td>
+            <td style="color:var(--go-green)">Native binary</td>
+            <td>JS engine</td>
+          </tr>
+          <tr>
+            <td>Concurrency</td>
+            <td style="color:var(--go-green)">Goroutines / CSP</td>
+            <td>Threads / async</td>
+            <td>GIL limited</td>
+            <td>async / threads</td>
+            <td>Event loop</td>
+          </tr>
+          <tr>
+            <td>Learning Curve</td>
+            <td style="color:var(--go-green)">Very Low</td>
+            <td>High</td>
+            <td>Very Low</td>
+            <td>Very High</td>
+            <td>Medium</td>
+          </tr>
+          <tr>
+            <td>Memory Safety</td>
+            <td style="color:var(--go-green)">GC safe</td>
+            <td>GC safe</td>
+            <td>GC safe</td>
+            <td style="color:var(--go-green)">Ownership model</td>
+            <td>GC safe</td>
+          </tr>
+          <tr>
+            <td>Build Time</td>
+            <td style="color:var(--go-green)">Seconds</td>
+            <td>Minutes</td>
+            <td>N/A</td>
+            <td>Minutes</td>
+            <td>N/A</td>
+          </tr>
+          <tr>
+            <td>Deploy Target</td>
+            <td style="color:var(--go-green)">Single binary</td>
+            <td>Needs JVM</td>
+            <td>Needs runtime</td>
+            <td style="color:var(--go-green)">Single binary</td>
+            <td>Needs Node</td>
+          </tr>
+          <tr>
+            <td>Cloud Native Use</td>
+            <td style="color:var(--go-green)">Dominant (K8s, Docker)</td>
+            <td>Enterprise</td>
+            <td>Data/ML</td>
+            <td>Systems/WASM</td>
+            <td>APIs/BFF</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- WHO USES GO -->
+  <section class="section">
+    <div class="section-tag">// ADOPTION</div>
+    <h2>Who Builds with Go?</h2>
+    <p class="section-sub">Go powers the infrastructure of the internet — from container orchestration to streaming platforms.</p>
+
+    <div class="company-grid">
+      <div class="company-card">
+        <div class="company-name">Google</div>
+        <div class="company-desc">Go was created at Google. Used in production for dl.google.com, YouTube serving infrastructure, and internal tooling at scale.</div>
+        <div class="company-detail">// birthplace of Go, 2009</div>
+      </div>
+      <div class="company-card">
+        <div class="company-name">Docker & Kubernetes</div>
+        <div class="company-desc">The entire container ecosystem is written in Go. Docker Engine, Kubernetes control plane, kubectl — all Go.</div>
+        <div class="company-detail">// defined cloud native</div>
+      </div>
+      <div class="company-card">
+        <div class="company-name">Cloudflare</div>
+        <div class="company-desc">Go handles billions of DNS queries and HTTP requests per day across Cloudflare's global edge network.</div>
+        <div class="company-detail">// 1T+ requests/month</div>
+      </div>
+      <div class="company-card">
+        <div class="company-name">Uber</div>
+        <div class="company-desc">Hundreds of Go microservices coordinate real-time dispatch, pricing, and geospatial queries globally.</div>
+        <div class="company-detail">// 1000+ Go services</div>
+      </div>
+      <div class="company-card">
+        <div class="company-name">Dropbox</div>
+        <div class="company-desc">Migrated performance-critical infrastructure from Python to Go, achieving massive throughput gains on their sync engine.</div>
+        <div class="company-detail">// python → go migration</div>
+      </div>
+      <div class="company-card">
+        <div class="company-name">HashiCorp</div>
+        <div class="company-desc">Terraform, Vault, Consul, Nomad — the entire infrastructure-as-code toolchain is pure Go.</div>
+        <div class="company-detail">// devops toolchain</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEARNING PATH PIPELINE -->
+  <section class="section">
+    <div class="section-tag">// YOUR JOURNEY</div>
+    <h2>The Go Learning Pipeline</h2>
+    <p class="section-sub">Follow this sequence for the fastest path from beginner to production-ready Go developer.</p>
+
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-num">01</div>
+        <div class="pipe-title">Basics & Syntax</div>
+        <div class="pipe-desc">Types, funcs, structs, interfaces, error handling</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">02</div>
+        <div class="pipe-title">Concurrency</div>
+        <div class="pipe-desc">Goroutines, channels, sync primitives</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">03</div>
+        <div class="pipe-title">HTTP & APIs</div>
+        <div class="pipe-desc">REST APIs, middleware, JSON, routing</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">04</div>
+        <div class="pipe-title">CLI & Tooling</div>
+        <div class="pipe-desc">Build CLIs, use go tools, testing</div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">05</div>
+        <div class="pipe-title">Production</div>
+        <div class="pipe-desc">Performance, profiling, deployment</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="basics.html">Basics</a>
+      <a href="concurrency.html">Concurrency</a>
+      <a href="http.html">HTTP</a>
+      <a href="cli.html">CLI</a>
+      <a href="cheatsheet.html">Cheatsheet</a>
+    </div>
+    <div class="footer-copy">// go-developer-guide · open source learning</div>
+  </footer>
+</main>
+
+<script>
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'COPIED!';
+    btn.style.color = 'var(--go-green)';
+    setTimeout(() => { btn.textContent = 'COPY'; btn.style.color = ''; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
+
+

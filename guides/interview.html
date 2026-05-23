@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Prep — GoGuide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--go-cyan:#00ADD8;--go-dark:#0a0e1a;--go-darker:#060810;--go-card:#0d1425;--go-border:rgba(0,173,216,0.15);--go-border-strong:rgba(0,173,216,0.4);--go-muted:#4a5568;--go-text:#e2e8f0;--go-subtle:#8892a4;--go-green:#00e599;--go-orange:#ff6b35;--sidebar-w:260px}
+  *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+  body{background:var(--go-dark);color:var(--go-text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.7;display:flex;min-height:100vh}
+  .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--go-darker);border-right:1px solid var(--go-border);position:fixed;top:0;left:0;display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+  .sidebar-logo{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid var(--go-border)}
+  .sidebar-logo a{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--go-cyan);text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+  .logo-glyph{width:28px;height:28px;background:var(--go-cyan);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--go-darker)}
+  .logo-badge{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-subtle);margin-top:4px;padding-left:36px}
+  .sidebar-nav{padding:1rem 0;flex:1}
+  .nav-group{margin-bottom:.25rem}
+  .nav-group-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--go-muted);padding:.75rem 1.25rem .3rem}
+  .nav-link{display:flex;align-items:center;gap:10px;padding:.45rem 1.25rem;color:var(--go-subtle);text-decoration:none;font-size:13.5px;transition:all .15s;border-left:2px solid transparent}
+  .nav-link:hover{color:var(--go-text);background:rgba(0,173,216,.05)}
+  .nav-link.active{color:var(--go-cyan);border-left-color:var(--go-cyan);background:rgba(0,173,216,.08)}
+  .nav-link .nav-icon{font-size:15px;width:18px;text-align:center}
+  .nav-badge{margin-left:auto;font-family:'Space Mono',monospace;font-size:9px;background:rgba(0,229,153,.15);color:var(--go-green);border:1px solid rgba(0,229,153,.3);padding:1px 6px;border-radius:3px}
+  .sidebar-footer{padding:1rem 1.25rem;border-top:1px solid var(--go-border);font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);line-height:1.6}
+  .sidebar-footer a{color:var(--go-cyan);text-decoration:none}
+  .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh}
+  .page-hero{padding:4rem 4rem 3rem;border-bottom:1px solid var(--go-border);position:relative;overflow:hidden}
+  .page-hero::before{content:'Q&A';position:absolute;right:2rem;top:50%;transform:translateY(-50%);font-family:'Syne',sans-serif;font-weight:800;font-size:10rem;color:rgba(0,173,216,.04);letter-spacing:-.05em;pointer-events:none}
+  .page-hero .new-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:10px;color:var(--go-green);border:1px solid rgba(0,229,153,.3);padding:3px 10px;border-radius:2px;background:rgba(0,229,153,.08);margin-bottom:1rem}
+  .breadcrumb{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-muted);margin-bottom:1rem}
+  .breadcrumb a{color:var(--go-cyan);text-decoration:none}
+  .page-hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.03em;color:#fff;margin-bottom:.75rem;line-height:1.1}
+  .page-hero h1 span{color:var(--go-cyan)}
+  .page-hero p{color:var(--go-subtle);max-width:540px;line-height:1.75}
+  .section{padding:3.5rem 4rem;border-bottom:1px solid var(--go-border)}
+  .section-tag{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);letter-spacing:.1em;margin-bottom:.75rem}
+  .section h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.75rem;letter-spacing:-.02em;color:#fff;margin-bottom:.5rem}
+  .section-sub{color:var(--go-subtle);max-width:600px;margin-bottom:2rem}
+  /* Q&A accordion */
+  .qa-list{display:flex;flex-direction:column;gap:.75rem}
+  .qa-item{background:var(--go-card);border:1px solid var(--go-border);border-radius:4px;overflow:hidden;transition:border-color .15s}
+  .qa-item.open{border-color:var(--go-border-strong)}
+  .qa-q{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.1rem 1.25rem;cursor:pointer;user-select:none}
+  .qa-q:hover{background:rgba(0,173,216,.03)}
+  .qa-num{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted);flex-shrink:0;margin-top:3px}
+  .qa-text{font-size:14px;color:var(--go-text);font-weight:500;line-height:1.5;flex:1}
+  .qa-arrow{font-size:12px;color:var(--go-cyan);flex-shrink:0;transition:transform .2s;margin-top:3px}
+  .qa-item.open .qa-arrow{transform:rotate(90deg)}
+  .qa-a{display:none;padding:0 1.25rem 1.25rem;border-top:1px solid var(--go-border)}
+  .qa-item.open .qa-a{display:block}
+  .qa-a p{font-size:13.5px;color:var(--go-subtle);line-height:1.7;margin-top:1rem}
+  .qa-a code{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--go-cyan);background:rgba(0,173,216,.08);padding:1px 5px;border-radius:2px}
+  /* Difficulty badges */
+  .diff{font-family:'Space Mono',monospace;font-size:9px;padding:2px 7px;border-radius:2px;border:1px solid;margin-left:.5rem;vertical-align:middle;flex-shrink:0}
+  .diff-easy{color:var(--go-green);border-color:rgba(0,229,153,.3);background:rgba(0,229,153,.08)}
+  .diff-med{color:var(--go-orange);border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.08)}
+  .diff-hard{color:#f72585;border-color:rgba(247,37,133,.3);background:rgba(247,37,133,.08)}
+  /* Code in answers */
+  .mini-code{background:var(--go-darker);border:1px solid var(--go-border);border-radius:3px;padding:.75rem 1rem;margin-top:.75rem;font-family:'Space Mono',monospace;font-size:12px;line-height:1.65;color:#cdd6f4;overflow-x:auto}
+  .kw{color:#89b4fa}.fn{color:#a6e3a1}.str{color:#f38ba8}.cmt{color:#585b70;font-style:italic}.ty{color:#cba6f7}
+  /* Tip strips */
+  .tip-strip{background:rgba(0,229,153,.05);border:1px solid rgba(0,229,153,.2);border-radius:4px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:13.5px;color:var(--go-subtle);line-height:1.65}
+  .tip-strip strong{color:var(--go-green);display:block;margin-bottom:.3rem}
+  .footer{padding:2rem 4rem;background:var(--go-darker);border-top:1px solid var(--go-border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+  .footer-links{display:flex;gap:1.5rem}
+  .footer-links a{font-family:'Space Mono',monospace;font-size:11px;color:var(--go-muted);text-decoration:none;transition:color .15s}
+  .footer-links a:hover{color:var(--go-cyan)}
+  .footer-copy{font-family:'Space Mono',monospace;font-size:10px;color:var(--go-muted)}
+  @media(max-width:900px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.page-hero,.section{padding:2.5rem 1.5rem}.footer{padding:1.5rem}}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html"><div class="logo-glyph">Go</div>GoGuide v1.0</a>
+    <div class="logo-badge">// Developer Learning Portal</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Getting Started</div>
+      <a href="index.html" class="nav-link"><span class="nav-icon">⌂</span> Home</a>
+      <a href="roadmap.html" class="nav-link"><span class="nav-icon">⟶</span> Learning Roadmap</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Core Knowledge</div>
+      <a href="basics.html" class="nav-link"><span class="nav-icon">◈</span> Go Basics & Syntax</a>
+      <a href="concurrency.html" class="nav-link"><span class="nav-icon">⌬</span> Concurrency & Goroutines</a>
+      <a href="http.html" class="nav-link"><span class="nav-icon">⬡</span> HTTP & Web Dev</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Applied Go</div>
+      <a href="cli.html" class="nav-link"><span class="nav-icon">$</span> CLI Tools & Tooling</a>
+      <a href="performance.html" class="nav-link"><span class="nav-icon">◎</span> Systems & Performance<span class="nav-badge">NEW</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Reference</div>
+      <a href="cheatsheet.html" class="nav-link"><span class="nav-icon">≡</span> Cheatsheet</a>
+      <a href="interview.html" class="nav-link active"><span class="nav-icon">?</span> Interview Prep<span class="nav-badge">NEW</span></a>
+    </div>
+  </div>
+  <div class="sidebar-footer">Go 1.22 &nbsp;·&nbsp; <a href="https://go.dev/blog/" target="_blank">Go Blog ↗</a><br>Open Source Learning Project.</div>
+</nav>
+
+<main class="main">
+  <div class="page-hero">
+    <div class="breadcrumb"><a href="index.html">GoGuide</a> / interview</div>
+    <div class="new-badge">★ NEW MODULE</div>
+    <h1>Go <span>Interview</span><br>Prep</h1>
+    <p>The questions interviewers actually ask — covering language fundamentals, concurrency, memory, runtime behaviour, and system design. Click any question to reveal a complete answer.</p>
+  </div>
+
+  <!-- FUNDAMENTALS -->
+  <section class="section">
+    <div class="section-tag">// FUNDAMENTALS</div>
+    <h2>Language Fundamentals</h2>
+    <p class="section-sub">These appear in almost every Go interview. Know them cold.</p>
+
+    <div class="tip-strip">
+      <strong>Interview tip</strong>
+      For any "what's the difference between X and Y" question, give a one-line summary first, then a concrete code example. Interviewers reward clarity over exhaustive enumeration.
+    </div>
+
+    <div class="qa-list">
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q01</span>
+          <span class="qa-text">What is the difference between <code>var x int</code> and <code>x := 0</code>?</span>
+          <span class="diff diff-easy">EASY</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>Both declare an integer variable with value 0. The difference is scope and style: <code>var x int</code> is a full declaration usable at package level or inside a function. <code>x := 0</code> is the short declaration — only valid inside a function body. The short form is idiomatic Go for local variables. <code>var</code> is preferred at package scope or when you want to be explicit about the zero value without assigning.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q02</span>
+          <span class="qa-text">How does Go handle inheritance? Does it have classes?</span>
+          <span class="diff diff-easy">EASY</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>Go has no classes and no inheritance. Instead it uses <strong>composition via embedding</strong> and <strong>interfaces via structural typing</strong>. You embed one struct inside another to reuse fields and methods. A type satisfies an interface simply by implementing its method set — no explicit declaration needed. This avoids the fragile base class problem and keeps dependencies loose.</p>
+          <div class="mini-code"><span class="kw">type</span> <span class="ty">Animal</span> <span class="kw">struct</span>{ Name <span class="ty">string</span> }
+<span class="kw">type</span> <span class="ty">Dog</span> <span class="kw">struct</span>{ <span class="ty">Animal</span>; Breed <span class="ty">string</span> } <span class="cmt">// embedding</span>
+d := <span class="ty">Dog</span>{Animal: <span class="ty">Animal</span>{Name:<span class="str">"Rex"</span>}, Breed:<span class="str">"Husky"</span>}
+<span class="fn">fmt.Println</span>(d.Name) <span class="cmt">// promoted field — "Rex"</span></div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q03</span>
+          <span class="qa-text">What is the zero value in Go, and why does it matter?</span>
+          <span class="diff diff-easy">EASY</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>Every type in Go has a zero value — the default when a variable is declared without assignment. <code>int</code> → <code>0</code>, <code>string</code> → <code>""</code>, <code>bool</code> → <code>false</code>, pointers/slices/maps/channels/functions → <code>nil</code>. This eliminates undefined behaviour — Go variables are always in a valid, usable state. It also enables idiomatic patterns like <code>sync.Mutex</code> which is ready to use without initialisation.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q04</span>
+          <span class="qa-text">What is a slice, and how is it different from an array?</span>
+          <span class="diff diff-easy">EASY</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>An <strong>array</strong> in Go has a fixed size that is part of its type — <code>[3]int</code> and <code>[4]int</code> are different types. A <strong>slice</strong> is a descriptor pointing to an underlying array, with a length and capacity — it grows dynamically via <code>append</code>. In practice you almost never use raw arrays; slices are the standard. The key gotcha: slices sharing the same backing array share mutations — use <code>copy</code> to break this link.</p>
+          <div class="mini-code"><span class="cmt">// Slice header = (pointer, len, cap)</span>
+s1 := []<span class="ty">int</span>{<span class="fn">1</span>,<span class="fn">2</span>,<span class="fn">3</span>}
+s2 := s1          <span class="cmt">// same backing array!</span>
+s2[<span class="fn">0</span>] = <span class="fn">99</span>       <span class="cmt">// mutates s1[0] too</span>
+s3 := <span class="fn">make</span>([]<span class="ty">int</span>, <span class="fn">len</span>(s1))
+<span class="fn">copy</span>(s3, s1)      <span class="cmt">// independent copy</span></div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q05</span>
+          <span class="qa-text">How does Go handle errors? Why no exceptions?</span>
+          <span class="diff diff-easy">EASY</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>Go treats errors as plain return values of type <code>error</code> (a built-in interface with one method: <code>Error() string</code>). Functions return <code>(result, error)</code>. The caller <em>must</em> handle the error explicitly — it cannot be silently ignored like an exception that unwinds invisibly. This makes error handling visible in the call graph, makes APIs honest about what can fail, and eliminates unexpected control-flow jumps. Use <code>fmt.Errorf("context: %w", err)</code> to wrap errors with context while keeping them unwrappable.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q06</span>
+          <span class="qa-text">What is the difference between a pointer receiver and a value receiver?</span>
+          <span class="diff diff-med">MEDIUM</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>A <strong>value receiver</strong> <code>func (u User) Name()</code> receives a copy of the struct — mutations inside the method don't affect the original. A <strong>pointer receiver</strong> <code>func (u *User) SetName()</code> receives a pointer — mutations persist. Use pointer receivers when: (1) the method mutates the receiver, (2) the struct is large and copying is expensive, or (3) you need consistent interface implementation across a type. Rule: if any method uses a pointer receiver, all methods should.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONCURRENCY -->
+  <section class="section">
+    <div class="section-tag">// CONCURRENCY</div>
+    <h2>Concurrency Questions</h2>
+    <p class="section-sub">The topic most Go interviewers go deepest on. Know the runtime model, not just the syntax.</p>
+
+    <div class="qa-list">
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q07</span>
+          <span class="qa-text">What is a goroutine? How is it different from a thread?</span>
+          <span class="diff diff-easy">EASY</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>A goroutine is a lightweight, cooperatively-scheduled execution unit managed by the Go runtime — not the OS. OS threads typically start with 1–8MB stacks; goroutines start at 2KB and grow on demand. The Go scheduler (M:N scheduler) multiplexes thousands of goroutines onto a small pool of OS threads (GOMAXPROCS defaults to CPU count). Context-switching between goroutines is 10–100× cheaper than OS thread context switches. This is why you can have hundreds of thousands of goroutines in one process.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q08</span>
+          <span class="qa-text">What is a data race, and how do you detect one?</span>
+          <span class="diff diff-med">MEDIUM</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>A data race occurs when two goroutines access the same memory location concurrently and at least one access is a write, with no synchronisation between them. Data races cause undefined behaviour — corrupted data, crashes, or subtle bugs that only appear under load. Go ships a built-in race detector: run <code>go test -race ./...</code> or <code>go run -race main.go</code>. It instruments memory accesses at runtime and reports races with full stack traces. Always run <code>-race</code> in CI. Fix races with channels, <code>sync.Mutex</code>, or <code>sync/atomic</code>.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q09</span>
+          <span class="qa-text">What is the difference between a buffered and unbuffered channel?</span>
+          <span class="diff diff-med">MEDIUM</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>An <strong>unbuffered channel</strong> (<code>make(chan T)</code>) requires both sender and receiver to be ready simultaneously — it's a synchronisation point. The send blocks until a receiver is ready, and vice versa. A <strong>buffered channel</strong> (<code>make(chan T, N)</code>) holds up to N values without a receiver. Sends only block when the buffer is full. Use unbuffered for strict synchronisation, buffered for decoupling producer/consumer rates or as a semaphore. Misusing either causes deadlocks or goroutine leaks.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q10</span>
+          <span class="qa-text">What is a goroutine leak, and how do you prevent it?</span>
+          <span class="diff diff-hard">HARD</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>A goroutine leak occurs when a goroutine is started but never exits — it blocks forever waiting on a channel, network call, or lock that will never complete. Over time, leaks exhaust memory. Prevention: always give goroutines a way to exit via <code>context.Context</code> cancellation or a done channel. Use <code>goleak</code> in tests to detect leaks automatically. The <code>/debug/pprof/goroutine</code> endpoint reveals stuck goroutines in production.</p>
+          <div class="mini-code"><span class="cmt">// Leak: goroutine blocks forever if ctx never cancels</span>
+<span class="kw">go func</span>() {
+    <span class="kw">select</span> {
+    <span class="kw">case</span> <-ctx.<span class="fn">Done</span>(): <span class="kw">return</span> <span class="cmt">// clean exit</span>
+    <span class="kw">case</span> v := <-work:  <span class="fn">process</span>(v)
+    }
+}()</div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q11</span>
+          <span class="qa-text">Explain the Go memory model and the happens-before relationship.</span>
+          <span class="diff diff-hard">HARD</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>The Go memory model defines the conditions under which reads are guaranteed to observe a write. A read <em>r</em> of variable <em>x</em> can observe a write <em>w</em> if: <em>w</em> happens-before <em>r</em> and no other write happens between <em>w</em> and <em>r</em>. Synchronisation events that create happens-before edges include: goroutine creation (<code>go</code>), channel operations (send happens-before receive on unbuffered; close happens-before receive returning zero), mutex unlock before lock, <code>sync.Once.Do</code>. Without a happens-before edge, the compiler and CPU can reorder operations — meaning you can't rely on a write in one goroutine being visible in another without explicit synchronisation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RUNTIME & INTERNALS -->
+  <section class="section">
+    <div class="section-tag">// RUNTIME</div>
+    <h2>Runtime & Internals</h2>
+    <p class="section-sub">Senior-level questions that separate those who've read about Go from those who've run it in production.</p>
+
+    <div class="qa-list">
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q12</span>
+          <span class="qa-text">How does Go's garbage collector work?</span>
+          <span class="diff diff-hard">HARD</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>Go uses a <strong>tri-color mark-and-sweep</strong> garbage collector that runs concurrently with the program. Objects are white (unreachable), grey (reachable, children not scanned), or black (reachable, children scanned). The GC starts marking from roots (stacks, globals), turns objects grey then black. Unreachable (white) objects are swept. The STW (stop-the-world) pauses are very short — typically under 1ms since Go 1.14 — because most marking happens concurrently. The GC is triggered when heap size doubles. Use <code>GOGC</code> env var to tune aggressiveness (default 100 = GC when heap doubles).</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q13</span>
+          <span class="qa-text">What is escape analysis, and why does it matter?</span>
+          <span class="diff diff-hard">HARD</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>Escape analysis is a compile-time analysis that determines whether a variable can live on the stack or must be allocated on the heap. Stack allocations are free — the frame is popped when the function returns. Heap allocations require GC. A variable "escapes" to the heap when: it's returned as a pointer, stored in an interface, captured by a closure that outlives the function, or sent on a channel. Run <code>go build -gcflags='-m' ./...</code> to see exactly what escapes and why. Reducing escapes directly reduces GC pressure.</p>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q14</span>
+          <span class="qa-text">What does <code>defer</code> do, and when does it execute?</span>
+          <span class="diff diff-med">MEDIUM</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p><code>defer</code> schedules a function call to execute when the surrounding function returns — whether that return is normal, via <code>return</code> statement, or due to a panic. Multiple defers run in LIFO order. Arguments to a deferred function are evaluated immediately at the defer statement, not at execution time. Common uses: closing files/connections, unlocking mutexes, recovering from panics. The overhead is small but non-zero — avoid in hot inner loops.</p>
+          <div class="mini-code"><span class="kw">func</span> <span class="fn">readFile</span>(path <span class="ty">string</span>) <span class="ty">error</span> {
+    f, err := <span class="fn">os.Open</span>(path)
+    <span class="kw">if</span> err != <span class="kw">nil</span> { <span class="kw">return</span> err }
+    <span class="kw">defer</span> f.<span class="fn">Close</span>() <span class="cmt">// runs when readFile returns</span>
+    <span class="cmt">// ... use f</span>
+}</div>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <div class="qa-q" onclick="toggle(this)">
+          <span class="qa-num">Q15</span>
+          <span class="qa-text">What are Go generics, and when should you use them?</span>
+          <span class="diff diff-med">MEDIUM</span>
+          <span class="qa-arrow">▶</span>
+        </div>
+        <div class="qa-a">
+          <p>Go 1.18 introduced generics via type parameters. They let you write functions and types that work across multiple types without code duplication or losing type safety. Use generics when: you're writing a reusable data structure (a typed stack, queue, or set), a utility function that operates on any slice or map, or a library that needs to work across numeric types. Don't use generics to avoid interfaces when interfaces are simpler — the Go team motto is "if in doubt, don't."</p>
+          <div class="mini-code"><span class="cmt">// Generic function — works on any ordered type</span>
+<span class="kw">func</span> <span class="fn">Min</span>[T <span class="ty">constraints.Ordered</span>](a, b T) T {
+    <span class="kw">if</span> a < b { <span class="kw">return</span> a }
+    <span class="kw">return</span> b
+}
+<span class="fn">Min</span>(<span class="fn">3</span>, <span class="fn">5</span>)         <span class="cmt">// int</span>
+<span class="fn">Min</span>(<span class="str">"a"</span>, <span class="str">"b"</span>)     <span class="cmt">// string</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="basics.html">Basics</a>
+      <a href="concurrency.html">Concurrency</a>
+      <a href="cheatsheet.html">Cheatsheet</a>
+      <a href="performance.html">Performance</a>
+    </div>
+    <div class="footer-copy">// go-developer-guide · interview module</div>
+  </footer>
+</main>
+<script>
+function toggle(el){const item=el.parentElement;item.classList.toggle('open')}
+</script>
+</body>
+</html>

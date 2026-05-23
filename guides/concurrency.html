@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concurrency & Goroutines — GoGuide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --go-cyan: #00ADD8;
+    --go-dark: #0a0e1a;
+    --go-darker: #060810;
+    --go-card: #0d1425;
+    --go-border: rgba(0,173,216,0.15);
+    --go-border-strong: rgba(0,173,216,0.4);
+    --go-muted: #4a5568;
+    --go-text: #e2e8f0;
+    --go-subtle: #8892a4;
+    --go-green: #00e599;
+    --go-orange: #ff6b35;
+    --go-pink: #f72585;
+    --go-purple: #7c3aed;
+    --sidebar-w: 260px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--go-dark);
+    color: var(--go-text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--go-darker);
+    border-right: 1px solid var(--go-border);
+    position: fixed;
+    top: 0; left: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 1.5rem 1.25rem 1rem;
+    border-bottom: 1px solid var(--go-border);
+  }
+  .sidebar-logo a {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--go-cyan);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-glyph {
+    width: 28px; height: 28px;
+    background: var(--go-cyan);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--go-darker);
+  }
+  .logo-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-subtle);
+    margin-top: 4px;
+    padding-left: 36px;
+  }
+  .sidebar-nav { padding: 1rem 0; flex: 1; }
+  .nav-group { margin-bottom: 0.25rem; }
+  .nav-group-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--go-muted);
+    padding: 0.75rem 1.25rem 0.3rem;
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.45rem 1.25rem;
+    color: var(--go-subtle);
+    text-decoration: none;
+    font-size: 13.5px;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .nav-link:hover { color: var(--go-text); background: rgba(0,173,216,0.05); }
+  .nav-link.active { color: var(--go-cyan); border-left-color: var(--go-cyan); background: rgba(0,173,216,0.08); }
+  .nav-link .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .nav-badge {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    background: rgba(0,229,153,0.15);
+    color: var(--go-green);
+    border: 1px solid rgba(0,229,153,0.3);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  .sidebar-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--go-border);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-muted);
+    line-height: 1.6;
+  }
+  .sidebar-footer a { color: var(--go-cyan); text-decoration: none; }
+
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+
+  .page-hero {
+    padding: 4rem 4rem 3rem;
+    border-bottom: 1px solid var(--go-border);
+    position: relative;
+    overflow: hidden;
+  }
+  .page-hero::before {
+    content: 'GOROUTINES';
+    position: absolute;
+    right: 3rem; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 7rem;
+    color: rgba(0,173,216,0.04);
+    letter-spacing: -0.05em;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .breadcrumb {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--go-muted);
+    margin-bottom: 1rem;
+  }
+  .breadcrumb a { color: var(--go-cyan); text-decoration: none; }
+  .page-hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 0.75rem;
+    line-height: 1.1;
+  }
+  .page-hero h1 span { color: var(--go-cyan); }
+  .page-hero p { color: var(--go-subtle); max-width: 540px; line-height: 1.75; }
+
+  .section { padding: 3.5rem 4rem; border-bottom: 1px solid var(--go-border); }
+  .section-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+  .section h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+  .section-sub { color: var(--go-subtle); max-width: 540px; margin-bottom: 2rem; }
+
+  .code-block {
+    background: var(--go-darker);
+    border: 1px solid var(--go-border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--go-border);
+    background: rgba(0,0,0,0.2);
+  }
+  .code-filename { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--go-subtle); }
+  .code-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-cyan);
+    background: none;
+    border: 1px solid var(--go-border-strong);
+    padding: 3px 8px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .code-copy:hover { background: rgba(0,173,216,0.1); }
+  pre {
+    padding: 1.25rem;
+    overflow-x: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: #cdd6f4;
+  }
+  .kw { color: #89b4fa; }
+  .fn { color: #a6e3a1; }
+  .str { color: #f38ba8; }
+  .cmt { color: #585b70; font-style: italic; }
+  .num { color: #fab387; }
+  .ty { color: #cba6f7; }
+
+  /* Concept Cards */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .concept-card {
+    background: var(--go-card);
+    border: 1px solid var(--go-border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    position: relative;
+    transition: border-color 0.15s;
+  }
+  .concept-card:hover { border-color: var(--go-border-strong); }
+  .concept-card .cc-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--go-muted);
+    margin-bottom: 0.5rem;
+  }
+  .concept-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .concept-card p { font-size: 13px; color: var(--go-subtle); line-height: 1.6; }
+  .concept-card .cc-tag {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--go-cyan);
+    border: 1px solid var(--go-border-strong);
+    padding: 2px 8px;
+    border-radius: 2px;
+    background: rgba(0,173,216,0.08);
+  }
+
+  /* Callout boxes */
+  .callout {
+    border: 1px solid;
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+  .callout-body { font-size: 13.5px; line-height: 1.65; }
+  .callout-body strong { display: block; margin-bottom: 4px; font-weight: 500; }
+  .callout.tip { border-color: rgba(0,229,153,0.25); background: rgba(0,229,153,0.05); }
+  .callout.tip .callout-icon { color: var(--go-green); }
+  .callout.tip .callout-body strong { color: var(--go-green); }
+  .callout.tip .callout-body { color: var(--go-subtle); }
+  .callout.warn { border-color: rgba(255,107,53,0.25); background: rgba(255,107,53,0.05); }
+  .callout.warn .callout-icon { color: var(--go-orange); }
+  .callout.warn .callout-body strong { color: var(--go-orange); }
+  .callout.warn .callout-body { color: var(--go-subtle); }
+
+  /* Patterns table */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--go-border); border-radius: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--go-muted);
+    background: var(--go-darker);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--go-border);
+  }
+  tbody tr { border-bottom: 1px solid var(--go-border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(0,173,216,0.03); }
+  tbody td { padding: 0.65rem 1rem; color: var(--go-subtle); }
+  tbody td:first-child { color: var(--go-text); font-weight: 500; font-family: 'Space Mono', monospace; font-size: 12px; }
+  .good-cell { color: var(--go-green) !important; }
+  .warn-cell { color: var(--go-orange) !important; }
+
+  .footer {
+    padding: 2rem 4rem;
+    background: var(--go-darker);
+    border-top: 1px solid var(--go-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--go-muted); text-decoration: none; transition: color 0.15s; }
+  .footer-links a:hover { color: var(--go-cyan); }
+  .footer-copy { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--go-muted); }
+
+  @media(max-width:900px){
+    .sidebar { transform: translateX(-100%); }
+    .main { margin-left: 0; }
+    .page-hero, .section { padding: 2.5rem 1.5rem; }
+    .footer { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html">
+      <div class="logo-glyph">Go</div>
+      GoGuide v1.0
+    </a>
+    <div class="logo-badge">// Developer Learning Portal</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Getting Started</div>
+      <a href="index.html" class="nav-link"><span class="nav-icon">⌂</span> Home</a>
+      <a href="roadmap.html" class="nav-link"><span class="nav-icon">⟶</span> Learning Roadmap</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Core Knowledge</div>
+      <a href="basics.html" class="nav-link"><span class="nav-icon">◈</span> Go Basics & Syntax</a>
+      <a href="concurrency.html" class="nav-link active"><span class="nav-icon">⌬</span> Concurrency & Goroutines</a>
+      <a href="http.html" class="nav-link"><span class="nav-icon">⬡</span> HTTP & Web Dev</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Applied Go</div>
+      <a href="cli.html" class="nav-link"><span class="nav-icon">$</span> CLI Tools & Tooling</a>
+      <a href="performance.html" class="nav-link"><span class="nav-icon">◎</span> Systems & Performance<span class="nav-badge">NEW</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Reference</div>
+      <a href="cheatsheet.html" class="nav-link"><span class="nav-icon">≡</span> Cheatsheet</a>
+      <a href="interview.html" class="nav-link"><span class="nav-icon">?</span> Interview Prep<span class="nav-badge">NEW</span></a>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    Go 1.22 &nbsp;·&nbsp; <a href="https://go.dev/doc/effective_go#concurrency" target="_blank">Official Docs ↗</a><br>
+    Open Source Learning Project.
+  </div>
+</nav>
+
+<main class="main">
+  <div class="page-hero">
+    <div class="breadcrumb"><a href="index.html">GoGuide</a> / concurrency</div>
+    <h1>Concurrency &<br><span>Goroutines</span></h1>
+    <p>Go's concurrency model is its superpower. Learn goroutines, channels, mutexes, and the patterns that make Go concurrent programs safe, efficient, and elegant.</p>
+  </div>
+
+  <!-- CORE CONCEPTS -->
+  <section class="section">
+    <div class="section-tag">// FOUNDATION</div>
+    <h2>The Big Three</h2>
+    <p class="section-sub">Go's concurrency is built on three primitives. Master these and you can build anything concurrent.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="cc-num">01</div>
+        <h3>Goroutines</h3>
+        <p>Lightweight threads managed by the Go runtime — not the OS. You can run thousands of goroutines in a single process. They start with 2KB of stack and grow dynamically.</p>
+        <span class="cc-tag">go func()</span>
+      </div>
+      <div class="concept-card">
+        <div class="cc-num">02</div>
+        <h3>Channels</h3>
+        <p>Typed conduits for communication between goroutines. Channels synchronize execution and pass data safely without locks. "Don't communicate by sharing memory; share memory by communicating."</p>
+        <span class="cc-tag">make(chan T)</span>
+      </div>
+      <div class="concept-card">
+        <div class="cc-num">03</div>
+        <h3>Select</h3>
+        <p>Like a switch statement for channels. Lets a goroutine wait on multiple channel operations simultaneously, executing whichever is ready first. Essential for timeouts and fan-in patterns.</p>
+        <span class="cc-tag">select { case ... }</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- GOROUTINES -->
+  <section class="section">
+    <div class="section-tag">// GOROUTINES</div>
+    <h2>Launching Goroutines</h2>
+    <p class="section-sub">The <code style="font-family:Space Mono,monospace;font-size:12px;color:var(--go-cyan)">go</code> keyword is all you need. Prefix any function call and it runs concurrently.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">goroutine_basics.go</span>
+        <button class="code-copy" onclick="copyCode(this)">COPY</button>
+      </div>
+      <pre><span class="kw">package</span> main
+
+<span class="kw">import</span> (
+    <span class="str">"fmt"</span>
+    <span class="str">"sync"</span>
+    <span class="str">"time"</span>
+)
+
+<span class="kw">func</span> <span class="fn">worker</span>(id <span class="ty">int</span>, wg *<span class="ty">sync.WaitGroup</span>) {
+    <span class="kw">defer</span> wg.<span class="fn">Done</span>() <span class="cmt">// Signal completion when this goroutine finishes</span>
+    <span class="fn">fmt.Printf</span>(<span class="str">"Worker %d starting\n"</span>, id)
+    <span class="ty">time</span>.<span class="fn">Sleep</span>(<span class="ty">time</span>.Second)
+    <span class="fn">fmt.Printf</span>(<span class="str">"Worker %d done\n"</span>, id)
+}
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    <span class="kw">var</span> wg <span class="ty">sync.WaitGroup</span>
+
+    <span class="kw">for</span> i := <span class="num">1</span>; i <= <span class="num">5</span>; i++ {
+        wg.<span class="fn">Add</span>(<span class="num">1</span>)
+        <span class="kw">go</span> <span class="fn">worker</span>(i, &wg) <span class="cmt">// Launch 5 goroutines concurrently</span>
+    }
+
+    wg.<span class="fn">Wait</span>() <span class="cmt">// Block until all goroutines finish</span>
+    <span class="fn">fmt.Println</span>(<span class="str">"All workers done"</span>)
+}</pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body">
+        <strong>Always use sync.WaitGroup for coordination</strong>
+        Never use time.Sleep() to "wait" for goroutines. Use WaitGroup.Wait() to block the main goroutine until all workers have finished their work.
+      </div>
+    </div>
+  </section>
+
+  <!-- CHANNELS -->
+  <section class="section">
+    <div class="section-tag">// CHANNELS</div>
+    <h2>Channels & Communication</h2>
+    <p class="section-sub">Channels are how goroutines talk to each other. Think of a channel as a typed pipe — one goroutine sends, another receives.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">channels.go — producer / consumer pattern</span>
+        <button class="code-copy" onclick="copyCode(this)">COPY</button>
+      </div>
+      <pre><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="str">"fmt"</span>
+
+<span class="cmt">// Producer sends values into the channel</span>
+<span class="kw">func</span> <span class="fn">producer</span>(ch <span class="kw">chan</span><- <span class="ty">int</span>) {
+    <span class="kw">for</span> i := <span class="num">0</span>; i < <span class="num">5</span>; i++ {
+        ch <- i <span class="cmt">// Send i into channel</span>
+    }
+    <span class="kw">close</span>(ch) <span class="cmt">// Always close when done producing</span>
+}
+
+<span class="cmt">// Consumer reads values from the channel</span>
+<span class="kw">func</span> <span class="fn">consumer</span>(ch <-<span class="kw">chan</span> <span class="ty">int</span>) {
+    <span class="kw">for</span> v := <span class="kw">range</span> ch { <span class="cmt">// Range stops when channel is closed</span>
+        <span class="fn">fmt.Printf</span>(<span class="str">"Received: %d\n"</span>, v)
+    }
+}
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    ch := <span class="fn">make</span>(<span class="kw">chan</span> <span class="ty">int</span>, <span class="num">5</span>) <span class="cmt">// Buffered channel — capacity 5</span>
+    <span class="kw">go</span> <span class="fn">producer</span>(ch)
+    <span class="fn">consumer</span>(ch) <span class="cmt">// Runs in main goroutine</span>
+}</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">select.go — timeout pattern</span>
+        <button class="code-copy" onclick="copyCode(this)">COPY</button>
+      </div>
+      <pre><span class="kw">func</span> <span class="fn">fetchWithTimeout</span>(url <span class="ty">string</span>) (<span class="ty">string</span>, <span class="ty">error</span>) {
+    result := <span class="fn">make</span>(<span class="kw">chan</span> <span class="ty">string</span>, <span class="num">1</span>)
+
+    <span class="kw">go func</span>() {
+        <span class="cmt">// Simulate HTTP fetch</span>
+        result <- <span class="fn">fetch</span>(url)
+    }()
+
+    <span class="kw">select</span> {
+    <span class="kw">case</span> res := <-result:
+        <span class="kw">return</span> res, <span class="kw">nil</span>
+    <span class="kw">case</span> <-<span class="ty">time</span>.<span class="fn">After</span>(<span class="num">3</span> * <span class="ty">time</span>.Second):
+        <span class="kw">return</span> <span class="str">""</span>, <span class="fn">fmt.Errorf</span>(<span class="str">"request timed out"</span>)
+    }
+}</pre>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠</span>
+      <div class="callout-body">
+        <strong>Buffered vs Unbuffered Channels</strong>
+        An unbuffered channel <code style="font-family:Space Mono,monospace;font-size:11px">make(chan T)</code> blocks the sender until a receiver is ready. A buffered channel <code style="font-family:Space Mono,monospace;font-size:11px">make(chan T, N)</code> allows N sends before blocking. Choose carefully — wrong buffering leads to deadlocks or goroutine leaks.
+      </div>
+    </div>
+  </section>
+
+  <!-- SYNC PRIMITIVES -->
+  <section class="section">
+    <div class="section-tag">// SYNC PACKAGE</div>
+    <h2>Mutexes & Sync Primitives</h2>
+    <p class="section-sub">When channels are overkill, the <code style="font-family:Space Mono,monospace;color:var(--go-cyan);font-size:12px">sync</code> package provides classic concurrency tools — used correctly.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">mutex_safe_counter.go</span>
+        <button class="code-copy" onclick="copyCode(this)">COPY</button>
+      </div>
+      <pre><span class="kw">type</span> <span class="ty">SafeCounter</span> <span class="kw">struct</span> {
+    mu    <span class="ty">sync.Mutex</span>
+    count <span class="ty">int</span>
+}
+
+<span class="kw">func</span> (c *<span class="ty">SafeCounter</span>) <span class="fn">Increment</span>() {
+    c.mu.<span class="fn">Lock</span>()         <span class="cmt">// Acquire lock</span>
+    <span class="kw">defer</span> c.mu.<span class="fn">Unlock</span>() <span class="cmt">// Always release — even on panic</span>
+    c.count++
+}
+
+<span class="kw">func</span> (c *<span class="ty">SafeCounter</span>) <span class="fn">Value</span>() <span class="ty">int</span> {
+    c.mu.<span class="fn">Lock</span>()
+    <span class="kw">defer</span> c.mu.<span class="fn">Unlock</span>()
+    <span class="kw">return</span> c.count
+}
+
+<span class="cmt">// For read-heavy workloads, use sync.RWMutex:</span>
+<span class="cmt">// c.mu.RLock() / c.mu.RUnlock() for reads</span>
+<span class="cmt">// c.mu.Lock()  / c.mu.Unlock() for writes</span></pre>
+    </div>
+  </section>
+
+  <!-- PATTERNS TABLE -->
+  <section class="section">
+    <div class="section-tag">// CONCURRENCY PATTERNS</div>
+    <h2>Patterns at a Glance</h2>
+    <p class="section-sub">Common concurrency patterns, when to use them, and what to watch out for.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Pattern</th>
+            <th>Use When</th>
+            <th>Primitive</th>
+            <th>Watch Out For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Worker Pool</td>
+            <td>Limit parallel work, process job queue</td>
+            <td>Goroutines + channel</td>
+            <td class="warn-cell">Channel full → deadlock</td>
+          </tr>
+          <tr>
+            <td>Fan-Out / Fan-In</td>
+            <td>Parallelize multiple fetches, merge results</td>
+            <td>Multiple goroutines + select</td>
+            <td class="warn-cell">Goroutine leaks</td>
+          </tr>
+          <tr>
+            <td>Pipeline</td>
+            <td>Streaming data transformation stages</td>
+            <td>Chained channels</td>
+            <td class="warn-cell">Back-pressure needed</td>
+          </tr>
+          <tr>
+            <td>Done Channel</td>
+            <td>Cancellation propagation</td>
+            <td>context.Context or chan struct{}</td>
+            <td class="good-cell">Idiomatic Go approach</td>
+          </tr>
+          <tr>
+            <td>Mutex Guard</td>
+            <td>Shared state with simple read/write</td>
+            <td>sync.Mutex / RWMutex</td>
+            <td class="warn-cell">Lock contention</td>
+          </tr>
+          <tr>
+            <td>Once</td>
+            <td>Lazy initialization, singletons</td>
+            <td>sync.Once</td>
+            <td class="good-cell">Safe for concurrent init</td>
+          </tr>
+          <tr>
+            <td>Context</td>
+            <td>Deadlines, cancellation, request-scoped data</td>
+            <td>context.Context</td>
+            <td class="good-cell">Always pass as first arg</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CONTEXT -->
+  <section class="section">
+    <div class="section-tag">// CONTEXT PACKAGE</div>
+    <h2>Context — Cancellation & Deadlines</h2>
+    <p class="section-sub">The <code style="font-family:Space Mono,monospace;color:var(--go-cyan);font-size:12px">context</code> package is how Go propagates cancellation, deadlines, and request-scoped values across goroutines and API calls.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">context_cancel.go</span>
+        <button class="code-copy" onclick="copyCode(this)">COPY</button>
+      </div>
+      <pre><span class="kw">func</span> <span class="fn">doWork</span>(ctx <span class="ty">context.Context</span>) <span class="ty">error</span> {
+    <span class="kw">for</span> {
+        <span class="kw">select</span> {
+        <span class="kw">case</span> <-ctx.<span class="fn">Done</span>():
+            <span class="cmt">// Context cancelled or deadline exceeded</span>
+            <span class="kw">return</span> ctx.<span class="fn">Err</span>()
+        <span class="kw">default</span>:
+            <span class="cmt">// Do actual work</span>
+            <span class="fn">processNextItem</span>()
+        }
+    }
+}
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    <span class="cmt">// Cancel after 5 seconds</span>
+    ctx, cancel := <span class="ty">context</span>.<span class="fn">WithTimeout</span>(
+        <span class="ty">context</span>.<span class="fn">Background</span>(),
+        <span class="num">5</span>*<span class="ty">time</span>.Second,
+    )
+    <span class="kw">defer</span> <span class="fn">cancel</span>() <span class="cmt">// Always defer cancel to free resources</span>
+
+    <span class="kw">if</span> err := <span class="fn">doWork</span>(ctx); err != <span class="kw">nil</span> {
+        <span class="fn">fmt.Println</span>(<span class="str">"Work stopped:"</span>, err)
+    }
+}</pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✓</span>
+      <div class="callout-body">
+        <strong>Context is the first argument, always</strong>
+        By convention, context.Context is always the first parameter of any function that accepts it — never stored in a struct. This makes cancellation chains explicit and traceable.
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="basics.html">Basics</a>
+      <a href="http.html">HTTP</a>
+      <a href="cli.html">CLI</a>
+      <a href="cheatsheet.html">Cheatsheet</a>
+    </div>
+    <div class="footer-copy">// go-developer-guide · concurrency module</div>
+  </footer>
+</main>
+
+<script>
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'COPIED!';
+    btn.style.color = 'var(--go-green)';
+    setTimeout(() => { btn.textContent = 'COPY'; btn.style.color = ''; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
